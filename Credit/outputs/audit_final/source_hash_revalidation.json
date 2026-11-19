@@ -1,0 +1,141 @@
+{
+  "targeted_live": [
+    {
+      "kind": "tradeweb",
+      "date": "2026-05-20",
+      "url": "https://reports.tradeweb.com/DownloadSbSef.adl?file=/TWSBSEF-CDS-Report_2026-05-20.xml",
+      "expected_sha256": "f07e587576b085d7b53e89814d618638d3efbd6dec377bc81f6ab8c54ec6a1c4",
+      "checked_at_utc": "2026-11-18T22:09:51.955623+00:00",
+      "http": 200,
+      "observed_sha256": "f07e587576b085d7b53e89814d618638d3efbd6dec377bc81f6ab8c54ec6a1c4",
+      "exact_match": true
+    },
+    {
+      "kind": "sec",
+      "date": "2026-05-20",
+      "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/sec/SEC_CUMULATIVE_CREDITS_2026_05_20.zip",
+      "expected_sha256": "4dcc4dc14f56a7b92f543b746f3b60a8e86b7c5094f41d48324c5f83e95ce1bd",
+      "checked_at_utc": "2026-11-18T22:09:51.965745+00:00",
+      "http": 200,
+      "observed_sha256": "4dcc4dc14f56a7b92f543b746f3b60a8e86b7c5094f41d48324c5f83e95ce1bd",
+      "exact_match": true
+    },
+    {
+      "kind": "tradeweb",
+      "date": "2026-06-25",
+      "url": "https://reports.tradeweb.com/DownloadSbSef.adl?file=/TWSBSEF-CDS-Report_2026-06-25.xml",
+      "expected_sha256": "23d9484e4262ef8d74798531e66dd6035d5235e23d83128fd16be3f4eb1a4c74",
+      "checked_at_utc": "2026-11-18T22:09:51.968764+00:00",
+      "http": 200,
+      "observed_sha256": "23d9484e4262ef8d74798531e66dd6035d5235e23d83128fd16be3f4eb1a4c74",
+      "exact_match": true
+    },
+    {
+      "kind": "sec",
+      "date": "2026-06-25",
+      "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/sec/SEC_CUMULATIVE_CREDITS_2026_06_25.zip",
+      "expected_sha256": "a6abb49d668dc49370ffa4a621de8b0559167b0e2aa5a9704a916de5471ea678",
+      "checked_at_utc": "2026-11-18T22:09:51.969764+00:00",
+      "http": 200,
+      "observed_sha256": "a6abb49d668dc49370ffa4a621de8b0559167b0e2aa5a9704a916de5471ea678",
+      "exact_match": true
+    },
+    {
+      "kind": "ois",
+      "date": "2026-05-20",
+      "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip",
+      "expected_sha256": "f67e9006c95b43b8671486d9b80d32b4c0b5a2fee36ea864a7252805a3ab9c9c",
+      "checked_at_utc": "2026-11-18T22:09:53.702105+00:00",
+      "http": 200,
+      "observed_sha256": "f67e9006c95b43b8671486d9b80d32b4c0b5a2fee36ea864a7252805a3ab9c9c",
+      "exact_match": true
+    },
+    {
+      "kind": "ois",
+      "date": "2026-06-25",
+      "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_06_25.zip",
+      "expected_sha256": "a804df1c2f38c83d4002f56251b41664ba9e52e62adbe826c5e173f1927712d8",
+      "checked_at_utc": "2026-11-18T22:09:54.236430+00:00",
+      "http": 200,
+      "observed_sha256": "a804df1c2f38c83d4002f56251b41664ba9e52e62adbe826c5e173f1927712d8",
+      "exact_match": true
+    },
+    {
+      "kind": "ois",
+      "date": "2026-10-27",
+      "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_10_27.zip",
+      "expected_sha256": "0fa489122dc09d924bed9c76359368d5da35dd1875ace728bf4b7086014d18e3",
+      "checked_at_utc": "2026-11-18T22:09:55.942033+00:00",
+      "http": 200,
+      "observed_sha256": "0fa489122dc09d924bed9c76359368d5da35dd1875ace728bf4b7086014d18e3",
+      "exact_match": true
+    },
+    {
+      "kind": "ois",
+      "date": "2026-11-06",
+      "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_11_06.zip",
+      "expected_sha256": "8e1c29b703af93824547ff426528d483bd8eb57c08eb195e38c183a3d0af7b11",
+      "checked_at_utc": "2026-11-18T22:09:55.963846+00:00",
+      "http": 200,
+      "observed_sha256": "8e1c29b703af93824547ff426528d483bd8eb57c08eb195e38c183a3d0af7b11",
+      "exact_match": true
+    }
+  ],
+  "ois_raw_filters": [
+    {
+      "date": "2026-05-20",
+      "n": 37,
+      "not_standardized_report_missing": 14,
+      "n_independent_source_matches": 37,
+      "currency": "EUR",
+      "lag_observed": false,
+      "first_execution_at_utc": "2026-05-20T06:32:02Z",
+      "last_execution_at_utc": "2026-05-20T15:59:15Z",
+      "package_count": 0,
+      "upfront_count": 0
+    },
+    {
+      "date": "2026-06-25",
+      "n": 55,
+      "not_standardized_report_missing": 16,
+      "n_independent_source_matches": 55,
+      "currency": "EUR",
+      "lag_observed": false,
+      "first_execution_at_utc": "2026-06-25T06:42:22Z",
+      "last_execution_at_utc": "2026-06-25T16:27:19Z",
+      "package_count": 0,
+      "upfront_count": 0
+    },
+    {
+      "date": "2026-10-27",
+      "n": 50,
+      "not_standardized_report_missing": 19,
+      "n_independent_source_matches": 50,
+      "currency": "EUR",
+      "lag_observed": false,
+      "first_execution_at_utc": "2026-10-27T07:36:43Z",
+      "last_execution_at_utc": "2026-10-27T16:49:24Z",
+      "package_count": 0,
+      "upfront_count": 0
+    },
+    {
+      "date": "2026-11-06",
+      "n": 45,
+      "not_standardized_report_missing": 18,
+      "n_independent_source_matches": 45,
+      "currency": "EUR",
+      "lag_observed": false,
+      "first_execution_at_utc": "2026-11-06T07:29:04Z",
+      "last_execution_at_utc": "2026-11-06T16:59:55Z",
+      "package_count": 0,
+      "upfront_count": 0
+    }
+  ],
+  "checks": {
+    "cached_tradeweb_prints": 21,
+    "tradeweb_closing_file_days": 18,
+    "sec_cached_lifecycle_reports_scanned": 140,
+    "linked_actions": {},
+    "invalidating_LINKED_CORR_EROR": 0
+  }
+}

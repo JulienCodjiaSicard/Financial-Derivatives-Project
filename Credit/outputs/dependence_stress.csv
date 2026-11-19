@@ -1,0 +1,8 @@
+model,scenario,status,kappa,sigma,beta,theta,y0,first_default_pd_7y,mc_se,paired_pd_delta_vs_independence,paired_pd_delta_se,max_marginal_error_probability
+lognormal,zero_loading,simulated,0.65,0.45,0.0,0.003,0.002,0.25346,0.0019453433033786093,0.0,0.0,1.3322676295501878e-15
+lognormal,lower_ou_vol,simulated,0.65,0.25,1.0,0.003,0.002,0.25266,0.0019433112174842197,-0.0008,0.0006693251526150789,0.00010505943559002695
+lognormal,higher_ou_vol,simulated,0.65,0.85,1.0,0.003,0.002,0.24772000000000005,0.0019305688363795788,-0.00574,0.001217444327849873,0.0005733767460450734
+lognormal,slower_mean_reversion,simulated,0.2,0.45,1.0,0.003,0.002,0.24744,0.0019298365029193536,-0.00602,0.0012641626296260632,0.0005202086366589143
+cirpp,lower_cir_vol,simulated,0.65,0.02,1.0,0.003,0.002,0.25370000000000004,0.0019459512326880138,0.00024,0.000353272336911455,2.1224480790893452e-05
+cirpp,higher_cir_vol,simulated,0.65,0.05,1.0,0.003,0.002,0.25346,0.0019453433033786093,0.0,0.0005425918245953973,6.558298637504567e-05
+cirpp,infeasible_shift,DEMO_BANK_A: CIR++ would require a negative continuous shift. Reduce the CIR baseline or use lognormal.,,,,,,,,,,

@@ -1,0 +1,23 @@
+{
+  "academic_status": "C — ENGINE VALIDATED, REAL MARKET DATA PENDING",
+  "pytest_command": "python -m pytest -q -rs",
+  "pytest_terminal_summary": "...............................................                          [100%]\n47 passed in 38.00s",
+  "browser_edge": {
+    "tabs": 3,
+    "cirpp": true,
+    "download": true,
+    "riskRepricing": true,
+    "historicalReplay": true,
+    "snapshotCsvUpload": true,
+    "horizonWarning": true,
+    "flatExtrapolation": true,
+    "offlineCharts": 6,
+    "errors": []
+  },
+  "snapshot_cli_fixture_only": {
+    "test_data_kind": "synthetic fixture for external-input schema",
+    "reported_horizon_years": 5.0,
+    "extrapolation": false
+  },
+  "baseline_archive_sha256": "f698ac4b508b1f73dbd62444382dc5da6cf9c512d04945b435b8b16462363427"
+}

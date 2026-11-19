@@ -1,0 +1,165 @@
+{
+  "quantlib_version": "1.44",
+  "cases": [
+    {
+      "case": "low_1Y",
+      "accrual": false,
+      "maturity_years": 1.0,
+      "recovery": 0.05,
+      "analytic_spread_bps": 3.8120250227263566,
+      "analytic_pv": -0.009467706148720839,
+      "results": [
+        {
+          "integration_days": 2,
+          "spread_difference_bps": 0.00025931239594445543,
+          "pv_difference_per_unit": 2.5523913637151563e-08
+        },
+        {
+          "integration_days": 1,
+          "spread_difference_bps": 0.00013054733592587908,
+          "pv_difference_per_unit": 1.2849670825640369e-08
+        }
+      ]
+    },
+    {
+      "case": "low_1Y",
+      "accrual": true,
+      "maturity_years": 1.0,
+      "recovery": 0.05,
+      "analytic_spread_bps": 3.811835062497365,
+      "analytic_pv": -0.009468196664036714,
+      "results": [
+        {
+          "integration_days": 2,
+          "spread_difference_bps": 0.0002634479374945542,
+          "pv_difference_per_unit": 3.6237350800605306e-08
+        },
+        {
+          "integration_days": 1,
+          "spread_difference_bps": 0.00013262938720570716,
+          "pv_difference_per_unit": 1.824319848311995e-08
+        }
+      ]
+    },
+    {
+      "case": "stub_piecewise",
+      "accrual": false,
+      "maturity_years": 2.347945205479452,
+      "recovery": 0.4,
+      "analytic_spread_bps": 124.54224449579304,
+      "analytic_pv": 0.0054111403692399945,
+      "results": [
+        {
+          "integration_days": 2,
+          "spread_difference_bps": 0.009928801442029567,
+          "pv_difference_per_unit": 2.189128965376236e-06
+        },
+        {
+          "integration_days": 1,
+          "spread_difference_bps": 0.00498763536216984,
+          "pv_difference_per_unit": 1.0996873191400358e-06
+        }
+      ]
+    },
+    {
+      "case": "stub_piecewise",
+      "accrual": true,
+      "maturity_years": 2.347945205479452,
+      "recovery": 0.4,
+      "analytic_spread_bps": 124.22678954299167,
+      "analytic_pv": 0.005355152155686438,
+      "results": [
+        {
+          "integration_days": 2,
+          "spread_difference_bps": 0.016888123491980878,
+          "pv_difference_per_unit": 3.4320777703711336e-06
+        },
+        {
+          "integration_days": 1,
+          "spread_difference_bps": 0.008485258777369609,
+          "pv_difference_per_unit": 1.724326504942697e-06
+        }
+      ]
+    },
+    {
+      "case": "high_7Y",
+      "accrual": false,
+      "maturity_years": 7.0,
+      "recovery": 0.65,
+      "analytic_spread_bps": 451.0941951138749,
+      "analytic_pv": 0.1390643368741629,
+      "results": [
+        {
+          "integration_days": 2,
+          "spread_difference_bps": 0.05104591540293768,
+          "pv_difference_per_unit": 2.0218694796347858e-05
+        },
+        {
+          "integration_days": 1,
+          "spread_difference_bps": 0.02566263900365584,
+          "pv_difference_per_unit": 1.016467354142403e-05
+        }
+      ]
+    },
+    {
+      "case": "high_7Y",
+      "accrual": true,
+      "maturity_years": 7.0,
+      "recovery": 0.65,
+      "analytic_spread_bps": 444.06960768363643,
+      "analytic_pv": 0.13843777799118676,
+      "results": [
+        {
+          "integration_days": 2,
+          "spread_difference_bps": 0.202920657433026,
+          "pv_difference_per_unit": 3.405781412824105e-05
+        },
+        {
+          "integration_days": 1,
+          "spread_difference_bps": 0.10203580383904409,
+          "pv_difference_per_unit": 1.7122352608256453e-05
+        }
+      ]
+    },
+    {
+      "case": "inverted_forward",
+      "accrual": false,
+      "maturity_years": 1.6164383561643836,
+      "recovery": 0.2,
+      "analytic_spread_bps": 248.21639346112866,
+      "analytic_pv": 0.023603710575488518,
+      "results": [
+        {
+          "integration_days": 2,
+          "spread_difference_bps": 0.007347034798272034,
+          "pv_difference_per_unit": 1.1700276799052334e-06
+        },
+        {
+          "integration_days": 1,
+          "spread_difference_bps": 0.0036838809126606975,
+          "pv_difference_per_unit": 5.866642469494476e-07
+        }
+      ]
+    },
+    {
+      "case": "inverted_forward",
+      "accrual": true,
+      "maturity_years": 1.6164383561643836,
+      "recovery": 0.2,
+      "analytic_spread_bps": 247.28575101632367,
+      "analytic_pv": 0.023543777329056118,
+      "results": [
+        {
+          "integration_days": 2,
+          "spread_difference_bps": 0.028122585178010695,
+          "pv_difference_per_unit": 2.5149391507002516e-06
+        },
+        {
+          "integration_days": 1,
+          "spread_difference_bps": 0.014126867582461955,
+          "pv_difference_per_unit": 1.2626536298188107e-06
+        }
+      ]
+    }
+  ]
+}

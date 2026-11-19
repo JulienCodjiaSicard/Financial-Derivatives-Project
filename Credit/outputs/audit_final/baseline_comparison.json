@@ -1,0 +1,224 @@
+{
+  "public_csv": {
+    "cds_coverage.csv": {
+      "rows": 404,
+      "original_columns": 4,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "cds_near_5y_audit.csv": {
+      "rows": 376,
+      "original_columns": 14,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "credit_sensitivity.csv": {
+      "rows": 240,
+      "original_columns": 49,
+      "added_columns": [
+        "result_kind"
+      ],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "discount_quality.csv": {
+      "rows": 15,
+      "original_columns": 11,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "first_default_sensitivity.csv": {
+      "rows": 32,
+      "original_columns": 12,
+      "added_columns": [
+        "result_kind"
+      ],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "transaction_first_default.csv": {
+      "rows": 1064,
+      "original_columns": 14,
+      "added_columns": [
+        "result_kind"
+      ],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "transaction_repricing_sensitivity.csv": {
+      "rows": 184,
+      "original_columns": 77,
+      "added_columns": [
+        "dtcc_notional_capped",
+        "market_par_verified",
+        "quote_quality",
+        "result_kind"
+      ],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "transaction_snapshots.csv": {
+      "rows": 21,
+      "original_columns": 20,
+      "added_columns": [
+        "coupon_bps",
+        "cumulative_pd",
+        "market_par_verified",
+        "quote_quality",
+        "recovery",
+        "source_quote_type"
+      ],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "transaction_survival.csv": {
+      "rows": 302,
+      "original_columns": 10,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    }
+  },
+  "demo_csv": {
+    "backtest_bank.csv": {
+      "rows": 84,
+      "original_columns": 5,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "backtest_daily.csv": {
+      "rows": 28,
+      "original_columns": 7,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "backtest_holdout.csv": {
+      "rows": 168,
+      "original_columns": 8,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "backtest_repricing.csv": {
+      "rows": 420,
+      "original_columns": 38,
+      "added_columns": [
+        "discount_curve_kind"
+      ],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "backtest_status.csv": {
+      "rows": 28,
+      "original_columns": 4,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "basket.csv": {
+      "rows": 255,
+      "original_columns": 8,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "dependence_stress.csv": {
+      "rows": 7,
+      "original_columns": 13,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "grid_convergence.csv": {
+      "rows": 6,
+      "original_columns": 6,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "invariants.csv": {
+      "rows": 3,
+      "original_columns": 3,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "joint_cds.csv": {
+      "rows": 32,
+      "original_columns": 25,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "performance_and_models.csv": {
+      "rows": 9,
+      "original_columns": 13,
+      "added_columns": [],
+      "excluded_timing_columns": [
+        "fit_seconds",
+        "simulation_seconds"
+      ],
+      "max_abs_numeric_difference": 0
+    },
+    "probabilities_semiannual.csv": {
+      "rows": 45,
+      "original_columns": 10,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "repricing.csv": {
+      "rows": 15,
+      "original_columns": 38,
+      "added_columns": [
+        "discount_curve_kind"
+      ],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "stochastic_marginals.csv": {
+      "rows": 765,
+      "original_columns": 8,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "stress_banks.csv": {
+      "rows": 150,
+      "original_columns": 10,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    },
+    "stress_basket.csv": {
+      "rows": 10,
+      "original_columns": 10,
+      "added_columns": [],
+      "excluded_timing_columns": [],
+      "max_abs_numeric_difference": 0
+    }
+  },
+  "same_raw_data": [
+    "data/candidate_banks.csv",
+    "data/cds_template.csv",
+    "data/eur_template.csv",
+    "data/demo/demo_cds_history.csv",
+    "data/demo/demo_eur_history.csv",
+    "data/market/dtcc.csv",
+    "data/market/dtcc_archive_manifest.csv",
+    "data/market/dtcc_ois.csv",
+    "data/market/estr.csv",
+    "data/market/mmsr.csv",
+    "data/market/ois_trades.csv",
+    "data/market/tradeweb.csv",
+    "data/market/tradeweb_archive_manifest.csv",
+    "data/proxies/ecb_aaa.csv",
+    "data/proxies/ecb_all.csv",
+    "data/proxies/eiopa.csv"
+  ]
+}

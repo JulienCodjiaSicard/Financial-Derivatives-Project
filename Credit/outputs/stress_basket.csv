@@ -1,0 +1,11 @@
+scenario,data_kind,source_data_kind,spread_bump_bps,status,first_default_pd_7y,delta_pd_percentage_points,entity,tenor_years,recovery
++1 bp,scenario,synthetic,1.0,recalibrated,0.25644788052949774,0.261924080090048,,,
++10 bp,scenario,synthetic,10.0,recalibrated,0.2796116732580658,2.5783033529468535,,,
++50 bp,scenario,synthetic,50.0,recalibrated,0.37414738243268497,12.031874270408771,,,
+-10 bp,scenario,synthetic,-10.0,recalibrated,0.2271240413757626,-2.6704598352834674,,,
+one bank +10 bp,scenario,synthetic,10.0,recalibrated,0.2625227174330338,0.8694077704436531,DEMO_BANK_A,,
+one tenor +10 bp,scenario,synthetic,10.0,recalibrated,0.2532980606356844,-0.05305790929128751,DEMO_BANK_A,5.0,
+recovery 20%,scenario,synthetic,,recalibrated,0.19680690749928775,-5.70217322293095,,,0.2
+recovery 30%,scenario,synthetic,,recalibrated,0.22173107962159322,-3.209756010700404,,,0.3
+recovery 40%,scenario,synthetic,,recalibrated,0.25382863972859726,0.0,,,0.4
+recovery 50%,scenario,synthetic,,recalibrated,0.29667165062828826,4.2843010899691,,,0.5

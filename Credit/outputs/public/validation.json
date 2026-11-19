@@ -1,0 +1,74 @@
+{
+  "date_utc": "2026-11-18T21:26:50.357489+00:00",
+  "python": "3.12.14",
+  "pytest": "9.2.0",
+  "baseline_passed": 47,
+  "baseline_duration_seconds": 34.53,
+  "suite_command": "python -m pytest -v -rs -p no:cacheprovider -o faulthandler_timeout=45",
+  "suite_passed": 55,
+  "suite_failed": 0,
+  "suite_skipped": 0,
+  "suite_duration_seconds": 76.93,
+  "browser": "Microsoft Edge headless / Playwright / local Streamlit",
+  "browser_verified": [
+    "PUBLIC, 3 tabs",
+    "OIS provenance",
+    "public repricing CSV",
+    "7Y tail stress",
+    "historical observed snapshots",
+    "synthetic credit rate sensitivity"
+  ],
+  "live_fetch": {
+    "tradeweb_cds": {
+      "2026-05-20": 3,
+      "2026-06-25": 1,
+      "2026-11-17": 0
+    },
+    "dtcc_sec_archives": 140,
+    "tradeweb_xml_archives": 139,
+    "tradeweb_xml_missing_dates": [
+      "2026-10-26"
+    ],
+    "ecb_aaa": {
+      "dates": 140,
+      "rows": 1820
+    },
+    "ecb_all": {
+      "dates": 140,
+      "rows": 1820
+    },
+    "estr": {
+      "rows": 140
+    },
+    "dtcc_ois": {
+      "2026-05-20": 37,
+      "2026-06-25": 55,
+      "2026-10-27": 50,
+      "2026-11-06": 45,
+      "2026-11-17": "rejected: missing 2Y pillar"
+    },
+    "eiopa_reference": "2026-10-31",
+    "mmsr_verified": true
+  },
+  "financial_validation": {
+    "matched_prints": 21,
+    "matched_dates": 18,
+    "banks": 6,
+    "repricings_including_stresses": 184,
+    "all_probability_invariants_passed": true,
+    "max_absolute_repricing_error_bps": 1.5205614545266144e-12
+  },
+  "archive_smoke": {
+    "public_csv_reproduced_byte_for_byte": 9,
+    "demo_quick_quotes": 15,
+    "demo_quick_max_residual_bps": 8.38e-13
+  },
+  "offline_commands": [
+    "python credit_engine.py --transaction-study",
+    "python credit_engine.py --public-study"
+  ],
+  "previous_archive_sha256": {
+    "ECE_2026_Module_Credit.zip": "f698ac4b508b1f73dbd62444382dc5da6cf9c512d04945b435b8b16462363427",
+    "ECE_2026_Module_Credit_Final.zip": "30f1e647fba14340f467f5321b7e31f5d08db0ece961faf6b960b787f68489ca"
+  }
+}

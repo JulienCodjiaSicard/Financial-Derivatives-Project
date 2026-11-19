@@ -1,0 +1,60 @@
+{
+  "generated_at_utc": "2026-11-18T22:23:29.150443+00:00",
+  "status": "CREDIT FINALIZED WITH MODEL CONVENTION LIMITATIONS",
+  "tradeweb_decision": "OPTION B academic running-spread equivalent",
+  "external_integration": "PENDING EXTERNAL TEAMS",
+  "unchanged_archives_sha256": {
+    "ECE_2026_Module_Credit.zip": "f698ac4b508b1f73dbd62444382dc5da6cf9c512d04945b435b8b16462363427",
+    "ECE_2026_Module_Credit_Final.zip": "30f1e647fba14340f467f5321b7e31f5d08db0ece961faf6b960b787f68489ca",
+    "ECE_2026_Module_Credit_Donnees_Publiques.zip": "5ca4e390dfd0e47ba6035e3023cc70dd2d57640dee0ce457da8647228c7c830b"
+  },
+  "tests": {
+    "command": "python -m pytest -q -rs -p no:cacheprovider -o faulthandler_timeout=50",
+    "baseline": {
+      "passed": 55,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_s": 82.11
+    },
+    "final": {
+      "passed": 60,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_s": 84.84
+    }
+  },
+  "tools": {
+    "python": "3.12.14",
+    "QuantLib": "1.44",
+    "dashboard": "Streamlit 1.67.0 / Microsoft Edge / Playwright"
+  },
+  "observations": {
+    "cds": 21,
+    "cds_banks": 6,
+    "cds_dates": 18,
+    "ois": 187,
+    "ois_dates": 4,
+    "targeted_http_hashes_exact": 8
+  },
+  "offline_outputs": {
+    "public_tables": 9,
+    "demo_tables": 16,
+    "max_baseline_abs_numeric_difference": 0,
+    "timing_columns_excluded": true,
+    "retained_data_files_byte_identical": 16
+  },
+  "browser_checks": [
+    "three existing tabs",
+    "displayed OIS chart and repricing table",
+    "Option B and CDS provenance",
+    "7-year extrapolation warning",
+    "public history and rates-only study",
+    "verified CSV download"
+  ],
+  "runs": [
+    "python credit_engine.py --transaction-study",
+    "python credit_engine.py --public-study",
+    "python credit_engine.py --output <standalone_demo_output>"
+  ],
+  "integration_fixture": "external OIS file, correlated innovations, coupon survival mask and joint CDS repricing"
+}

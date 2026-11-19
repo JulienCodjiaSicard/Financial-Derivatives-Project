@@ -1,0 +1,203 @@
+{
+  "comparisons": [
+    {
+      "file": "repricing.csv",
+      "rows": 15,
+      "columns_checked": 33,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "probabilities_semiannual.csv",
+      "rows": 45,
+      "columns_checked": 9,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "basket.csv",
+      "rows": 255,
+      "columns_checked": 8,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "stochastic_marginals.csv",
+      "rows": 765,
+      "columns_checked": 8,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "joint_cds.csv",
+      "rows": 4,
+      "columns_checked": 11,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "backtest_daily.csv",
+      "rows": 28,
+      "columns_checked": 6,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "backtest_holdout.csv",
+      "rows": 84,
+      "columns_checked": 7,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "stress_basket.csv",
+      "rows": 10,
+      "columns_checked": 8,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "performance_and_models.csv",
+      "rows": 9,
+      "columns_checked": 11,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": [
+        "fit_seconds",
+        "simulation_seconds"
+      ]
+    },
+    {
+      "file": "backtest_status.csv",
+      "rows": 28,
+      "columns_checked": 3,
+      "max_numeric_difference": 0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "backtest_bank.csv",
+      "rows": 84,
+      "columns_checked": 5,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "backtest_repricing.csv",
+      "rows": 420,
+      "columns_checked": 33,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "dependence_stress.csv",
+      "rows": 7,
+      "columns_checked": 13,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "grid_convergence.csv",
+      "rows": 6,
+      "columns_checked": 6,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "stress_banks.csv",
+      "rows": 150,
+      "columns_checked": 8,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    },
+    {
+      "file": "invariants.csv",
+      "rows": 3,
+      "columns_checked": 3,
+      "max_numeric_difference": 0.0,
+      "excluded_timing_fields": []
+    }
+  ],
+  "quantlib_aligned_benchmark_exact_match": true,
+  "max_residual_bps": 1.9610979506978765e-12,
+  "first_default_pd_at_7y": 0.25382863972859715,
+  "replayed_dates": 28,
+  "tests": "........................................                                 [100%]\n40 passed in 21.65s",
+  "baseline_archive_sha256": "f698ac4b508b1f73dbd62444382dc5da6cf9c512d04945b435b8b16462363427",
+  "final_non_regression_on_shared_cases": [
+    {
+      "file": "repricing",
+      "rows": 15,
+      "max_absolute_numeric_delta": 1.9610979506978765e-12
+    },
+    {
+      "file": "probabilities_semiannual",
+      "rows": 45,
+      "max_absolute_numeric_delta": 1.0234868508263162e-15
+    },
+    {
+      "file": "basket",
+      "rows": 255,
+      "max_absolute_numeric_delta": 9.992007221626409e-16
+    },
+    {
+      "file": "stochastic_marginals",
+      "rows": 765,
+      "max_absolute_numeric_delta": 1.1102230246251565e-15
+    },
+    {
+      "file": "backtest_status",
+      "rows": 28,
+      "max_absolute_numeric_delta": 0
+    },
+    {
+      "file": "backtest_daily",
+      "rows": 28,
+      "max_absolute_numeric_delta": 1.5916157281026244e-12
+    },
+    {
+      "file": "backtest_bank",
+      "rows": 84,
+      "max_absolute_numeric_delta": 1.1102230246251565e-16
+    },
+    {
+      "file": "backtest_repricing",
+      "rows": 420,
+      "max_absolute_numeric_delta": 2.6432189770275727e-12
+    },
+    {
+      "file": "backtest_holdout",
+      "rows": 84,
+      "max_absolute_numeric_delta": 2.6858515411731787e-12
+    },
+    {
+      "file": "stress_basket",
+      "rows": 10,
+      "max_absolute_numeric_delta": 1.1102230246251565e-14
+    },
+    {
+      "file": "stress_banks",
+      "rows": 150,
+      "max_absolute_numeric_delta": 2.4424906541753444e-11
+    },
+    {
+      "file": "performance_and_models",
+      "rows": 9,
+      "max_absolute_numeric_delta": 3.361533273960049e-12
+    },
+    {
+      "file": "dependence_stress",
+      "rows": 7,
+      "max_absolute_numeric_delta": 1.1102230246251565e-16
+    },
+    {
+      "file": "grid_convergence",
+      "rows": 6,
+      "max_absolute_numeric_delta": 2.220446049250313e-16
+    },
+    {
+      "file": "invariants",
+      "rows": 3,
+      "max_absolute_numeric_delta": 1.1226575225009583e-12
+    }
+  ],
+  "intentionally_changed_export": "joint_cds.csv: redesigned paired scenario experiment, archived baseline reproduced"
+}

@@ -1,0 +1,405 @@
+valuation_date,bank_name,exclusion_reason,observations
+2026-05-06,"Banco Santander, S.A.",unsigned_upfront_and_unknown_clean_convention,1
+2026-05-07,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-05-08,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-05-12,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-05-12,Deutsche Bank AG,unsigned_upfront_and_unknown_clean_convention,1
+2026-05-13,"Banco Santander, S.A.",linked_correction_or_error,1
+2026-05-13,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,1
+2026-05-14,BNP Paribas SA,unsigned_upfront_and_capped_notional,2
+2026-05-14,BNP Paribas SA,unsigned_upfront_and_unknown_clean_convention,1
+2026-05-18,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-05-19,BNP Paribas SA,linked_correction_or_error,1
+2026-05-19,BNP Paribas SA,unsigned_upfront_and_capped_notional,3
+2026-05-19,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-05-19,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-05-20,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-05-20,Commerzbank AG,unsigned_upfront_and_capped_notional,1
+2026-05-20,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-05-21,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-05-22,Deutsche Bank AG,unsigned_upfront_and_capped_notional,2
+2026-05-22,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-05-28,Commerzbank AG,linked_correction_or_error,1
+2026-05-28,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-05-29,BNP Paribas SA,linked_correction_or_error,4
+2026-05-29,Intesa Sanpaolo S.p.A.,linked_correction_or_error,4
+2026-06-01,BNP Paribas SA,package_or_unconfirmed_outright,1
+2026-06-01,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-06-01,BNP Paribas SA,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-01,Commerzbank AG,package_or_unconfirmed_outright,1
+2026-06-01,Commerzbank AG,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-01,Crédit Agricole SA,package_or_unconfirmed_outright,1
+2026-06-01,Crédit Agricole SA,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-01,Deutsche Bank AG,package_or_unconfirmed_outright,1
+2026-06-01,Deutsche Bank AG,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-01,Intesa Sanpaolo S.p.A.,package_or_unconfirmed_outright,1
+2026-06-01,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-01,Société Générale SA,package_or_unconfirmed_outright,1
+2026-06-01,Société Générale SA,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-02,BNP Paribas SA,linked_correction_or_error,1
+2026-06-02,BNP Paribas SA,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-02,Commerzbank AG,unsigned_upfront_and_capped_notional,1
+2026-06-03,BNP Paribas SA,package_or_unconfirmed_outright,1
+2026-06-03,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-06-03,Commerzbank AG,package_or_unconfirmed_outright,1
+2026-06-03,Commerzbank AG,unsigned_upfront_and_capped_notional,1
+2026-06-03,Crédit Agricole SA,package_or_unconfirmed_outright,1
+2026-06-03,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-06-03,Deutsche Bank AG,package_or_unconfirmed_outright,1
+2026-06-03,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-06-03,Intesa Sanpaolo S.p.A.,package_or_unconfirmed_outright,1
+2026-06-03,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-06-03,Société Générale SA,package_or_unconfirmed_outright,1
+2026-06-03,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-06-04,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-06-04,Société Générale SA,linked_correction_or_error,1
+2026-06-05,BNP Paribas SA,package_or_unconfirmed_outright,3
+2026-06-05,BNP Paribas SA,unsigned_upfront_and_capped_notional,3
+2026-06-05,Commerzbank AG,package_or_unconfirmed_outright,1
+2026-06-05,Commerzbank AG,unsigned_upfront_and_capped_notional,2
+2026-06-05,Crédit Agricole SA,package_or_unconfirmed_outright,1
+2026-06-05,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-06-05,Deutsche Bank AG,package_or_unconfirmed_outright,1
+2026-06-05,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-06-05,Intesa Sanpaolo S.p.A.,package_or_unconfirmed_outright,1
+2026-06-05,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-06-05,Société Générale SA,package_or_unconfirmed_outright,1
+2026-06-05,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-06-09,BNP Paribas SA,unsigned_upfront_and_capped_notional,2
+2026-06-10,Commerzbank AG,unsigned_upfront_and_capped_notional,1
+2026-06-10,Crédit Agricole SA,unsigned_upfront_and_unknown_clean_convention,2
+2026-06-15,BNP Paribas SA,package_or_unconfirmed_outright,1
+2026-06-15,BNP Paribas SA,unsigned_upfront_and_capped_notional,2
+2026-06-15,Commerzbank AG,package_or_unconfirmed_outright,1
+2026-06-15,Commerzbank AG,unsigned_upfront_and_capped_notional,1
+2026-06-15,Crédit Agricole SA,package_or_unconfirmed_outright,1
+2026-06-15,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-06-15,Deutsche Bank AG,package_or_unconfirmed_outright,1
+2026-06-15,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-06-15,Intesa Sanpaolo S.p.A.,package_or_unconfirmed_outright,1
+2026-06-15,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-06-15,Société Générale SA,package_or_unconfirmed_outright,1
+2026-06-15,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-06-16,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-06-17,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-06-17,UniCredit S.p.A.,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-18,Deutsche Bank AG,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-19,BNP Paribas SA,linked_correction_or_error,1
+2026-06-22,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-06-23,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-06-24,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-06-24,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-06-24,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-06-24,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-06-24,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-24,UniCredit S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-06-24,UniCredit S.p.A.,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-26,BNP Paribas SA,linked_correction_or_error,1
+2026-06-26,BNP Paribas SA,unsigned_upfront_and_capped_notional,3
+2026-06-26,BNP Paribas SA,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-26,Deutsche Bank AG,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-26,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_unknown_clean_convention,1
+2026-06-30,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-06-30,Société Générale SA,package_or_unconfirmed_outright,2
+2026-07-01,Deutsche Bank AG,linked_correction_or_error,1
+2026-07-01,Société Générale SA,unsigned_upfront_and_capped_notional,2
+2026-07-06,BNP Paribas SA,package_or_unconfirmed_outright,1
+2026-07-08,BNP Paribas SA,unsigned_upfront_and_capped_notional,2
+2026-07-09,Société Générale SA,unsigned_upfront_and_unknown_clean_convention,2
+2026-07-13,UniCredit S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-07-15,BNP Paribas SA,linked_correction_or_error,1
+2026-07-15,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,3
+2026-07-15,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-07-15,UniCredit S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-07-16,BNP Paribas SA,linked_correction_or_error,1
+2026-07-16,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-07-16,Commerzbank AG,unsigned_upfront_and_capped_notional,1
+2026-07-16,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-07-16,Deutsche Bank AG,coupon_only_missing_price_and_upfront,1
+2026-07-16,Deutsche Bank AG,package_or_unconfirmed_outright,1
+2026-07-17,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-07-17,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-07-17,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-07-17,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-07-20,BNP Paribas SA,linked_correction_or_error,1
+2026-07-20,BNP Paribas SA,unsigned_upfront_and_capped_notional,3
+2026-07-20,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-07-21,Commerzbank AG,linked_correction_or_error,2
+2026-07-21,Commerzbank AG,unsigned_upfront_and_capped_notional,2
+2026-07-21,Commerzbank AG,unsigned_upfront_and_unknown_clean_convention,4
+2026-07-23,Deutsche Bank AG,package_or_unconfirmed_outright,1
+2026-07-23,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-07-24,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-07-27,Commerzbank AG,unsigned_upfront_and_capped_notional,2
+2026-07-27,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-07-28,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,1
+2026-07-28,UniCredit S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-07-29,BNP Paribas SA,unsigned_upfront_and_capped_notional,4
+2026-07-29,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-07-29,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-07-30,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-07-30,Deutsche Bank AG,linked_correction_or_error,1
+2026-07-31,BNP Paribas SA,linked_correction_or_error,1
+2026-07-31,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-08-03,UniCredit S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-08-04,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-08-05,BNP Paribas SA,linked_correction_or_error,1
+2026-08-05,BNP Paribas SA,unsigned_upfront_and_unknown_clean_convention,1
+2026-08-05,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,1
+2026-08-05,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-08-05,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-08-06,Deutsche Bank AG,unsigned_upfront_and_capped_notional,2
+2026-08-10,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,1
+2026-08-11,BNP Paribas SA,linked_correction_or_error,2
+2026-08-11,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-08-12,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-08-12,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-08-14,BNP Paribas SA,linked_correction_or_error,8
+2026-08-14,Intesa Sanpaolo S.p.A.,linked_correction_or_error,6
+2026-08-18,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,2
+2026-08-20,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-08-20,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-08-21,Crédit Agricole SA,linked_correction_or_error,1
+2026-08-24,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-08-24,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_unknown_clean_convention,1
+2026-08-25,Crédit Agricole SA,unsigned_upfront_and_capped_notional,3
+2026-08-25,Deutsche Bank AG,unsigned_upfront_and_unknown_clean_convention,2
+2026-08-25,Société Générale SA,linked_correction_or_error,2
+2026-08-25,Société Générale SA,unsigned_upfront_and_capped_notional,2
+2026-08-26,BNP Paribas SA,unsigned_upfront_and_capped_notional,2
+2026-08-26,Deutsche Bank AG,unsigned_upfront_and_capped_notional,3
+2026-08-26,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-08-27,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,2
+2026-08-27,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-08-27,Intesa Sanpaolo S.p.A.,coupon_only_missing_price_and_upfront,1
+2026-08-28,Deutsche Bank AG,coupon_only_missing_price_and_upfront,1
+2026-08-28,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-09-01,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,1
+2026-09-01,Crédit Agricole SA,unsigned_upfront_and_capped_notional,3
+2026-09-01,Crédit Agricole SA,unsigned_upfront_and_unknown_clean_convention,1
+2026-09-02,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-09-03,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,2
+2026-09-08,Société Générale SA,unsigned_upfront_and_capped_notional,2
+2026-09-09,BNP Paribas SA,linked_correction_or_error,1
+2026-09-09,BNP Paribas SA,unsigned_upfront_and_capped_notional,2
+2026-09-09,Crédit Agricole SA,unsigned_upfront_and_capped_notional,4
+2026-09-09,Deutsche Bank AG,unsigned_upfront_and_capped_notional,4
+2026-09-09,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-09-09,Société Générale SA,linked_correction_or_error,1
+2026-09-09,Société Générale SA,unsigned_upfront_and_capped_notional,6
+2026-09-10,BNP Paribas SA,unsigned_upfront_and_capped_notional,2
+2026-09-10,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,1
+2026-09-10,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-09-10,Société Générale SA,linked_correction_or_error,2
+2026-09-11,BNP Paribas SA,unsigned_upfront_and_capped_notional,3
+2026-09-11,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,3
+2026-09-11,Deutsche Bank AG,unsigned_upfront_and_unknown_clean_convention,1
+2026-09-11,Société Générale SA,unsigned_upfront_and_capped_notional,3
+2026-09-14,Crédit Agricole SA,unsigned_upfront_and_capped_notional,2
+2026-09-14,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-09-14,Intesa Sanpaolo S.p.A.,linked_correction_or_error,1
+2026-09-14,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-09-14,Société Générale SA,unsigned_upfront_and_capped_notional,2
+2026-09-14,UniCredit S.p.A.,linked_correction_or_error,1
+2026-09-15,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-09-15,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,3
+2026-09-15,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-09-15,Deutsche Bank AG,unsigned_upfront_and_capped_notional,2
+2026-09-15,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-09-15,Société Générale SA,unsigned_upfront_and_capped_notional,5
+2026-09-16,BNP Paribas SA,linked_correction_or_error,24
+2026-09-16,BNP Paribas SA,package_or_unconfirmed_outright,3
+2026-09-16,Crédit Agricole SA,linked_correction_or_error,14
+2026-09-16,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-09-16,Intesa Sanpaolo S.p.A.,linked_correction_or_error,22
+2026-09-16,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-09-16,Société Générale SA,linked_correction_or_error,12
+2026-09-16,Société Générale SA,package_or_unconfirmed_outright,2
+2026-09-16,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-09-16,UniCredit S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-09-17,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-09-17,"Banco Santander, S.A.",linked_correction_or_error,1
+2026-09-17,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,2
+2026-09-17,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-09-17,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-09-18,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-09-18,Deutsche Bank AG,unsigned_upfront_and_capped_notional,3
+2026-09-18,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-09-18,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-09-22,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-09-22,Commerzbank AG,unsigned_upfront_and_capped_notional,1
+2026-09-22,Crédit Agricole SA,unsigned_upfront_and_capped_notional,2
+2026-09-22,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-09-23,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-09-23,Crédit Agricole SA,linked_correction_or_error,1
+2026-09-23,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-09-24,Crédit Agricole SA,linked_correction_or_error,1
+2026-09-24,Crédit Agricole SA,unsigned_upfront_and_capped_notional,3
+2026-09-24,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-09-24,Société Générale SA,linked_correction_or_error,1
+2026-09-24,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-09-25,BNP Paribas SA,coupon_only_missing_price_and_upfront,1
+2026-09-25,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-09-28,BNP Paribas SA,coupon_only_missing_price_and_upfront,1
+2026-09-28,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-09-29,BNP Paribas SA,coupon_only_missing_price_and_upfront,2
+2026-09-29,BNP Paribas SA,linked_correction_or_error,1
+2026-09-29,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-09-29,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-09-29,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-09-30,BNP Paribas SA,linked_correction_or_error,1
+2026-09-30,BNP Paribas SA,unsigned_upfront_and_capped_notional,2
+2026-09-30,Crédit Agricole SA,linked_correction_or_error,2
+2026-09-30,Crédit Agricole SA,unsigned_upfront_and_capped_notional,3
+2026-09-30,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-09-30,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-09-30,Société Générale SA,coupon_only_missing_price_and_upfront,1
+2026-09-30,Société Générale SA,package_or_unconfirmed_outright,2
+2026-09-30,Société Générale SA,unsigned_upfront_and_capped_notional,2
+2026-10-01,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-10-01,Crédit Agricole SA,unsigned_upfront_and_capped_notional,3
+2026-10-01,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,5
+2026-10-01,Société Générale SA,unsigned_upfront_and_capped_notional,5
+2026-10-02,BNP Paribas SA,linked_correction_or_error,8
+2026-10-02,Commerzbank AG,linked_correction_or_error,1
+2026-10-02,Crédit Agricole SA,linked_correction_or_error,8
+2026-10-02,Intesa Sanpaolo S.p.A.,linked_correction_or_error,9
+2026-10-02,Société Générale SA,linked_correction_or_error,5
+2026-10-02,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-10-02,Société Générale SA,unsigned_upfront_and_unknown_clean_convention,1
+2026-10-05,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-10-05,Société Générale SA,unsigned_upfront_and_capped_notional,2
+2026-10-06,BNP Paribas SA,linked_correction_or_error,1
+2026-10-06,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-10-06,UniCredit S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-10-07,BNP Paribas SA,unsigned_upfront_and_capped_notional,3
+2026-10-07,Commerzbank AG,unsigned_upfront_and_capped_notional,1
+2026-10-07,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-10-07,Deutsche Bank AG,unsigned_upfront_and_capped_notional,2
+2026-10-07,Deutsche Bank AG,unsigned_upfront_and_unknown_clean_convention,1
+2026-10-07,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-10-07,Société Générale SA,unsigned_upfront_and_capped_notional,2
+2026-10-08,BNP Paribas SA,unsigned_upfront_and_capped_notional,2
+2026-10-08,Crédit Agricole SA,linked_correction_or_error,2
+2026-10-08,Crédit Agricole SA,unsigned_upfront_and_capped_notional,7
+2026-10-08,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-10-08,Société Générale SA,unsigned_upfront_and_capped_notional,4
+2026-10-09,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-10-09,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-10-09,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-10-12,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-10-12,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-10-13,Société Générale SA,linked_correction_or_error,1
+2026-10-14,BNP Paribas SA,coupon_only_missing_price_and_upfront,1
+2026-10-14,BNP Paribas SA,unsigned_upfront_and_capped_notional,6
+2026-10-14,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,1
+2026-10-14,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-10-14,Deutsche Bank AG,linked_correction_or_error,1
+2026-10-14,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-10-14,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_unknown_clean_convention,1
+2026-10-14,Société Générale SA,unsigned_upfront_and_capped_notional,2
+2026-10-14,UniCredit S.p.A.,unsigned_upfront_and_unknown_clean_convention,1
+2026-10-15,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-10-15,Crédit Agricole SA,unsigned_upfront_and_unknown_clean_convention,2
+2026-10-15,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-10-15,Intesa Sanpaolo S.p.A.,linked_correction_or_error,1
+2026-10-15,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-10-15,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-10-15,UniCredit S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-10-16,BNP Paribas SA,linked_correction_or_error,4
+2026-10-16,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-10-16,Commerzbank AG,unsigned_upfront_and_capped_notional,1
+2026-10-16,Crédit Agricole SA,linked_correction_or_error,10
+2026-10-16,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-10-16,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-10-16,Intesa Sanpaolo S.p.A.,linked_correction_or_error,8
+2026-10-16,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-10-16,Société Générale SA,linked_correction_or_error,2
+2026-10-16,Société Générale SA,unsigned_upfront_and_capped_notional,5
+2026-10-19,BNP Paribas SA,linked_correction_or_error,1
+2026-10-19,BNP Paribas SA,unsigned_upfront_and_capped_notional,2
+2026-10-19,Crédit Agricole SA,unsigned_upfront_and_capped_notional,2
+2026-10-19,Crédit Agricole SA,unsigned_upfront_and_unknown_clean_convention,2
+2026-10-19,Société Générale SA,unsigned_upfront_and_capped_notional,6
+2026-10-19,Société Générale SA,unsigned_upfront_and_unknown_clean_convention,2
+2026-10-20,BNP Paribas SA,unsigned_upfront_and_capped_notional,3
+2026-10-20,Commerzbank AG,unsigned_upfront_and_capped_notional,1
+2026-10-20,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-10-20,Deutsche Bank AG,unsigned_upfront_and_capped_notional,3
+2026-10-20,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-10-20,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-10-21,BNP Paribas SA,unsigned_upfront_and_capped_notional,5
+2026-10-21,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-10-21,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-10-22,BNP Paribas SA,unsigned_upfront_and_capped_notional,3
+2026-10-22,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-10-22,Deutsche Bank AG,unsigned_upfront_and_unknown_clean_convention,1
+2026-10-23,BNP Paribas SA,linked_correction_or_error,2
+2026-10-23,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-10-23,BNP Paribas SA,unsigned_upfront_and_unknown_clean_convention,1
+2026-10-23,Société Générale SA,linked_correction_or_error,1
+2026-10-23,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-10-26,BNP Paribas SA,linked_correction_or_error,1
+2026-10-26,BNP Paribas SA,unsigned_upfront_and_capped_notional,4
+2026-10-26,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-10-26,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-10-27,BNP Paribas SA,linked_correction_or_error,2
+2026-10-27,BNP Paribas SA,unsigned_upfront_and_unknown_clean_convention,1
+2026-10-27,Commerzbank AG,linked_correction_or_error,2
+2026-10-27,Crédit Agricole SA,linked_correction_or_error,2
+2026-10-27,Crédit Agricole SA,unsigned_upfront_and_capped_notional,2
+2026-10-27,Deutsche Bank AG,linked_correction_or_error,2
+2026-10-27,Deutsche Bank AG,unsigned_upfront_and_unknown_clean_convention,1
+2026-10-27,Intesa Sanpaolo S.p.A.,linked_correction_or_error,2
+2026-10-27,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-10-27,Société Générale SA,linked_correction_or_error,2
+2026-10-27,Société Générale SA,spread_coexists_with_fixed_coupon,1
+2026-10-27,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-10-28,BNP Paribas SA,linked_correction_or_error,2
+2026-10-28,Commerzbank AG,unsigned_upfront_and_capped_notional,2
+2026-10-28,Crédit Agricole SA,linked_correction_or_error,2
+2026-10-28,Crédit Agricole SA,unsigned_upfront_and_capped_notional,2
+2026-10-28,Deutsche Bank AG,unsigned_upfront_and_capped_notional,3
+2026-10-28,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,2
+2026-10-28,Société Générale SA,unsigned_upfront_and_capped_notional,2
+2026-10-29,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-10-29,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-10-30,BNP Paribas SA,linked_correction_or_error,1
+2026-10-30,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-10-30,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-11-02,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-11-02,Deutsche Bank AG,linked_correction_or_error,2
+2026-11-02,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-11-02,Société Générale SA,coupon_only_missing_price_and_upfront,1
+2026-11-03,BNP Paribas SA,linked_correction_or_error,1
+2026-11-03,BNP Paribas SA,unsigned_upfront_and_capped_notional,1
+2026-11-03,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-11-03,Deutsche Bank AG,spread_coexists_with_fixed_coupon,2
+2026-11-03,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-11-04,BNP Paribas SA,linked_correction_or_error,1
+2026-11-04,BNP Paribas SA,unsigned_upfront_and_capped_notional,5
+2026-11-04,Commerzbank AG,unsigned_upfront_and_capped_notional,2
+2026-11-04,Crédit Agricole SA,unsigned_upfront_and_capped_notional,2
+2026-11-04,Deutsche Bank AG,unsigned_upfront_and_capped_notional,2
+2026-11-04,Intesa Sanpaolo S.p.A.,linked_correction_or_error,2
+2026-11-04,Société Générale SA,unsigned_upfront_and_capped_notional,5
+2026-11-05,Deutsche Bank AG,unsigned_upfront_and_unknown_clean_convention,1
+2026-11-05,Intesa Sanpaolo S.p.A.,linked_correction_or_error,3
+2026-11-05,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_unknown_clean_convention,1
+2026-11-05,Société Générale SA,linked_correction_or_error,2
+2026-11-05,Société Générale SA,unsigned_upfront_and_capped_notional,3
+2026-11-06,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-11-06,UniCredit S.p.A.,unsigned_upfront_and_capped_notional,1
+2026-11-10,BNP Paribas SA,linked_correction_or_error,1
+2026-11-10,"Banco Santander, S.A.",unsigned_upfront_and_capped_notional,1
+2026-11-10,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-11-10,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_unknown_clean_convention,1
+2026-11-10,UniCredit S.p.A.,unsigned_upfront_and_unknown_clean_convention,1
+2026-11-11,Crédit Agricole SA,unsigned_upfront_and_capped_notional,2
+2026-11-12,Crédit Agricole SA,unsigned_upfront_and_capped_notional,1
+2026-11-12,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-11-12,Société Générale SA,unsigned_upfront_and_capped_notional,1
+2026-11-13,BNP Paribas SA,unsigned_upfront_and_capped_notional,2
+2026-11-16,Deutsche Bank AG,coupon_only_missing_price_and_upfront,1
+2026-11-17,Deutsche Bank AG,unsigned_upfront_and_capped_notional,1
+2026-11-17,Intesa Sanpaolo S.p.A.,unsigned_upfront_and_capped_notional,1

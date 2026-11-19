@@ -1,0 +1,13 @@
+valuation_date,pillar_date,discount_factor,currency,time_basis,data_kind,provider,curve_kind,source_url
+2026-05-20,2026-05-22,0.9998928448167971,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip
+2026-05-20,2026-08-25,0.9943051681583308,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip
+2026-05-20,2026-11-24,0.9882223728025079,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip
+2026-05-20,2027-05-25,0.9749412342912397,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip
+2026-05-20,2028-05-23,0.9487680750091416,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip
+2026-05-20,2029-05-23,0.9234017030844591,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip
+2026-05-20,2030-05-23,0.898276351898066,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip
+2026-05-20,2031-05-23,0.8722570514590458,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip
+2026-05-20,2032-05-25,0.846161484316188,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip
+2026-05-20,2033-05-24,0.8200006275589339,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip
+2026-05-20,2034-05-23,0.7931322183324238,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip
+2026-05-20,2036-05-23,0.7420015299941567,EUR,ACT/365F,observed,DTCC/CFTC · transactions €STR OIS,eur_estr_ois_transaction_derived,https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_RATES_2026_05_20.zip

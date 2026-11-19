@@ -1,0 +1,18 @@
+[
+  {
+    "accrual": false,
+    "quantlib_version": "1.44",
+    "reference_bps": 102.5338564467587,
+    "engine_bps": 102.53447244654402,
+    "difference_bps": 0.0006159997853103505,
+    "buyer_pv_difference_per_unit": 6.698047636498339e-08
+  },
+  {
+    "accrual": true,
+    "quantlib_version": "1.44",
+    "reference_bps": 102.31329460009017,
+    "engine_bps": 102.31746504231644,
+    "difference_bps": 0.004170442226268278,
+    "buyer_pv_difference_per_unit": 4.056694286793533e-07
+  }
+]

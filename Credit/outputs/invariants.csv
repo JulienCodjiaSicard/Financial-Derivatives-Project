@@ -1,0 +1,4 @@
+entity_id,probability_invariants,max_abs_residual_bps
+DEMO_BANK_A,True,5.329070518200751e-13
+DEMO_BANK_B,True,8.384404281969182e-13
+DEMO_BANK_C,True,1.4210854715202004e-13
