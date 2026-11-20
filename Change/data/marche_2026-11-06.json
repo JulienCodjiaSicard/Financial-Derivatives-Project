@@ -1,0 +1,79 @@
+{
+  "date_marche": "2026-11-06",
+  "spot": {
+    "valeur": 1.1165,
+    "date": "2026-11-06",
+    "source": "Fixing BCE du 06/11/2026 (série EXR.D.USD.EUR.SP00.A, eurusd_bce_2026-05-06_2026-11-06.csv)",
+    "hypothese": false
+  },
+  "barriere_K": {
+    "valeur": 1.177,
+    "date_pic": "2026-05-07",
+    "source": "Max des fixings BCE du 06/05 au 06/11/2026 (contrôle, K est recalculé sur les fixings)",
+    "a_confirmer": "fixing BCE ou plus haut intrajournalier (question au prof)"
+  },
+  "courbes": {
+    "EUR": {
+      "indice": "€STR OIS",
+      "type_taux": "swap",
+      "base_calcul": "ACT/360",
+      "convention": "taux de swap au pair ; jambe fixe annuelle ACT/360 ; paiement unique jusqu'à 1 an",
+      "date": "2026-11-06",
+      "source": "BlueGamma, clôtures quotidiennes par maturité, relevé le 19/11/2026 (https://www.bluegamma.io/swap-rates/estr-swap-rates/<n>-<unit>-estr-swap-rate) ; data/courbes_ois_2026-11-06.csv",
+      "hypothese": false,
+      "points": [
+        {"pilier": "1M",  "maturite_annees": 0.08333333333333333, "taux_pct": 2.45},
+        {"pilier": "3M",  "maturite_annees": 0.25, "taux_pct": 2.56},
+        {"pilier": "6M",  "maturite_annees": 0.5,  "taux_pct": 2.67},
+        {"pilier": "1Y",  "maturite_annees": 1.0,  "taux_pct": 2.83},
+        {"pilier": "2Y",  "maturite_annees": 2.0,  "taux_pct": 2.93},
+        {"pilier": "3Y",  "maturite_annees": 3.0,  "taux_pct": 2.96},
+        {"pilier": "5Y",  "maturite_annees": 5.0,  "taux_pct": 2.98},
+        {"pilier": "7Y",  "maturite_annees": 7.0,  "taux_pct": 3.02},
+        {"pilier": "10Y", "maturite_annees": 10.0, "taux_pct": 3.11}
+      ]
+    },
+    "USD": {
+      "indice": "SOFR OIS",
+      "type_taux": "swap",
+      "base_calcul": "ACT/360",
+      "convention": "taux de swap au pair ; jambe fixe annuelle ACT/360 ; paiement unique jusqu'à 1 an. Pas de point 6M publié : interpolé entre 3M et 1Y à l'étape 2.",
+      "date": "2026-11-06",
+      "source": "BlueGamma, clôtures quotidiennes par maturité, relevé le 19/11/2026 (https://www.bluegamma.io/usd-swap-rates/<n>-<unit>-sofr-swap-rate) ; data/courbes_ois_2026-11-06.csv",
+      "hypothese": false,
+      "points": [
+        {"pilier": "1M",  "maturite_annees": 0.08333333333333333, "taux_pct": 3.89},
+        {"pilier": "3M",  "maturite_annees": 0.25, "taux_pct": 4.06},
+        {"pilier": "1Y",  "maturite_annees": 1.0,  "taux_pct": 4.25},
+        {"pilier": "2Y",  "maturite_annees": 2.0,  "taux_pct": 4.34},
+        {"pilier": "3Y",  "maturite_annees": 3.0,  "taux_pct": 4.38},
+        {"pilier": "5Y",  "maturite_annees": 5.0,  "taux_pct": 4.36},
+        {"pilier": "7Y",  "maturite_annees": 7.0,  "taux_pct": 4.39},
+        {"pilier": "10Y", "maturite_annees": 10.0, "taux_pct": 4.46}
+      ]
+    }
+  },
+  "points_de_terme": {
+    "points": [],
+    "source": null,
+    "hypothese": false
+  },
+  "volatilites": {
+    "source": "Saxo, tableau ATM / RR25 fourni par un camarade",
+    "date_cotation": null,
+    "spot_reference": 1.0992,
+    "commentaire": "Date de cotation inconnue : spot Saxo 1,0992, différent du fixing BCE du 06/11/2026 (1,1165). À aligner sur la date de valorisation. Manquent : BF25 pour toutes les maturités ; ATM, RR, BF de 2, 3, 5 et 7 ans.",
+    "piliers": [
+      {"pilier": "1W", "maturite_annees": 0.019178082191780823, "atm_pct": 5.67, "rr25_pct": -0.48, "bf25_pct": null, "source": "Saxo", "hypothese": false},
+      {"pilier": "1M", "maturite_annees": 0.08333333333333333,  "atm_pct": 6.24, "rr25_pct": -0.52, "bf25_pct": null, "source": "Saxo", "hypothese": false},
+      {"pilier": "3M", "maturite_annees": 0.25, "atm_pct": 6.13, "rr25_pct": -0.59, "bf25_pct": null, "source": "Saxo", "hypothese": false},
+      {"pilier": "6M", "maturite_annees": 0.5,  "atm_pct": 6.61, "rr25_pct": -0.78, "bf25_pct": null, "source": "Saxo", "hypothese": false},
+      {"pilier": "9M", "maturite_annees": 0.75, "atm_pct": 6.69, "rr25_pct": -0.80, "bf25_pct": null, "source": "Saxo", "hypothese": false},
+      {"pilier": "1Y", "maturite_annees": 1.0,  "atm_pct": 6.76, "rr25_pct": -0.84, "bf25_pct": null, "source": "Saxo", "hypothese": false},
+      {"pilier": "2Y", "maturite_annees": 2.0,  "atm_pct": null, "rr25_pct": null, "bf25_pct": null, "source": null, "hypothese": false},
+      {"pilier": "3Y", "maturite_annees": 3.0,  "atm_pct": null, "rr25_pct": null, "bf25_pct": null, "source": null, "hypothese": false},
+      {"pilier": "5Y", "maturite_annees": 5.0,  "atm_pct": null, "rr25_pct": null, "bf25_pct": null, "source": null, "hypothese": false},
+      {"pilier": "7Y", "maturite_annees": 7.0,  "atm_pct": null, "rr25_pct": null, "bf25_pct": null, "source": null, "hypothese": false}
+    ]
+  }
+}

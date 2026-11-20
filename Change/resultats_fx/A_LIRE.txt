@@ -1,0 +1,5 @@
+Donnees observees : CSV BCE et tableau ATM / RR Saxo fourni dans la conversation.
+Hypotheses : 3% EUR et 3% USD, nominal 50 M EUR, coupon 7% semestriel.
+Spot BCE au 17 novembre alors que la barriere est historique au 6 novembre.
+Sans BF et volatilites au-dela de 1 an, on ne peut pas calibrer un smile complet ni les 14 coupons.
+Pricing digital a volatilite ATM constante : approximation, ne valorise pas taux, credit ou callable.
