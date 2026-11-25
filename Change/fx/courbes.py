@@ -13,6 +13,11 @@ Conventions (voir aussi config.conventions.interpolation_courbes) :
 - DF entre les nœuds : interpolation log-linéaire en t (forwards constants par morceaux) ;
   aucune extrapolation au-delà du dernier nœud ;
 - courbe de type "zero" : taux zéro en composition continue sur la base de la courbe ;
+- courbe de type "df" : facteurs d'actualisation repris tels quels du sous-groupe taux
+  (output/curve_eur.csv et curve_usd.csv, grille mensuelle). Leurs maturités sont des
+  années ; elles sont utilisées directement comme temps t, sans conversion de dates.
+  L'interpolation log-linéaire entre leurs nœuds redonne exactement leur P_at (même
+  interpolation, nœuds alignés sur leur courbe) ;
 - X = USD pour 1 EUR : F(T) = S · DF_EUR(T) / DF_USD(T)  (parité des taux d'intérêt).
 """
 
@@ -170,7 +175,16 @@ def _taux_swap_complets(
 
 
 def bootstrap_courbe(courbe: Courbe, date_valo: date, base_temps: str) -> CourbeActualisation:
-    """Construit les DF d'une devise à partir de taux de swap OIS au pair ou de taux zéro."""
+    """Construit les DF d'une devise : taux de swap OIS au pair, taux zéro, ou DF lus tels quels."""
+    if courbe.type_taux == "df":
+        return CourbeActualisation(
+            devise=courbe.devise,
+            temps=(0.0, *(p.maturite_annees for p in courbe.points)),
+            facteurs=(1.0, *(p.valeur for p in courbe.points)),
+            piliers_interpoles=(),
+            source=courbe.source,
+            hypothese=courbe.hypothese,
+        )
     if courbe.type_taux == "zero":
         noeuds: list[tuple[float, float]] = []
         for p in courbe.points:

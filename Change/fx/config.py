@@ -31,7 +31,7 @@ TOLERANCE_SPOT = 1e-6
 ECART_SPOT_AVERTISSEMENT = 0.005
 
 BASES_CALCUL = ("ACT/365F", "ACT/360")
-TYPES_TAUX = ("zero", "swap")
+TYPES_TAUX = ("zero", "swap", "df")
 INTERPOLATIONS_DF = ("log_lineaire",)
 INTERPOLATIONS_SWAPS = ("lineaire",)
 METHODES_SMILE = ("vanna_volga", "sabr")
@@ -84,7 +84,8 @@ class Hypothese:
 
 @dataclass(frozen=True)
 class PointCourbe:
-    """Point d'une courbe : maturité en années et valeur (taux en % ou points de terme en pips).
+    """Point d'une courbe : maturité en années et valeur (taux en %, points de terme en pips,
+    ou facteur d'actualisation pour une courbe de type "df").
 
     ``pilier`` garde le libellé coté (1M, 2Y...) : l'étape 2 en tire la date exacte d'échéance.
     """
@@ -96,7 +97,8 @@ class PointCourbe:
 
 @dataclass(frozen=True)
 class Courbe:
-    """Courbe de taux d'une devise, en taux zéro ou en taux de swap (en %)."""
+    """Courbe de taux d'une devise : taux zéro ou taux de swap (en %), ou facteurs
+    d'actualisation (type "df") lus dans un fichier produit par le sous-groupe taux."""
 
     devise: str
     indice: str
@@ -106,6 +108,7 @@ class Courbe:
     source: str
     hypothese: bool
     convention: str | None = None  # ex. fréquence de la jambe fixe, en clair
+    fichier: Path | None = None  # fichier source d'une courbe de type "df"
 
 
 @dataclass(frozen=True)
@@ -360,16 +363,76 @@ def _points(liste: Any, cle_valeur: str, chemin: str) -> tuple[PointCourbe, ...]
     return points
 
 
+def lire_facteurs_fichier(chemin_fichier: Path, colonne_temps: str, colonne_df: str) -> tuple[PointCourbe, ...]:
+    """Lit un CSV de facteurs d'actualisation (t en années, DF) ; le nœud t = 0 est ignoré.
+
+    Format attendu : celui des sorties du sous-groupe taux (output/curve_eur.csv,
+    output/curve_usd.csv) : une ligne par maturité, colonnes nommées dans la config.
+    """
+    if not chemin_fichier.exists():
+        raise ErreurConfig(f"Fichier de courbe introuvable : {chemin_fichier}")
+    points: list[PointCourbe] = []
+    with chemin_fichier.open(encoding="utf-8-sig", newline="") as f:
+        lecteur = csv.DictReader(f)
+        if lecteur.fieldnames is None or not {colonne_temps, colonne_df} <= set(lecteur.fieldnames):
+            raise ErreurConfig(
+                f"{chemin_fichier.name} : colonnes {colonne_temps!r} et {colonne_df!r} attendues, "
+                f"trouvées {lecteur.fieldnames}"
+            )
+        for ligne, row in enumerate(lecteur, start=2):
+            try:
+                t, df = float(row[colonne_temps]), float(row[colonne_df])
+            except (TypeError, ValueError):
+                raise ErreurConfig(f"{chemin_fichier.name} ligne {ligne} : valeur illisible") from None
+            if not (math.isfinite(t) and math.isfinite(df)) or t < 0 or not 0 < df <= 1.5:
+                raise ErreurConfig(f"{chemin_fichier.name} ligne {ligne} : t = {t!r}, DF = {df!r} invalides")
+            if t > 0:
+                points.append(PointCourbe(maturite_annees=t, valeur=df))
+    if not points:
+        raise ErreurConfig(f"{chemin_fichier.name} : aucun facteur d'actualisation pour t > 0")
+    maturites = [p.maturite_annees for p in points]
+    if any(b <= a for a, b in zip(maturites, maturites[1:])):
+        raise ErreurConfig(f"{chemin_fichier.name} : maturités strictement croissantes attendues")
+    return tuple(points)
+
+
 def lire_courbe(
-    d: Any, devise: str, chemin: str, *, hypothese: bool, date_valo: date | None = None
+    d: Any,
+    devise: str,
+    chemin: str,
+    *,
+    hypothese: bool,
+    date_valo: date | None = None,
+    racine: Path | None = None,
 ) -> Courbe | None:
     """Lit une courbe de taux ; renvoie None si elle n'a aucun point.
 
+    Deux formes :
+    - "points" : liste de taux (zéro ou swap, en %) ;
+    - "fichier" (type_taux "df") : CSV de facteurs d'actualisation, chemin relatif à la
+      racine du projet, colonnes "colonne_temps" (défaut "t") et "colonne_df".
     Si la courbe porte un champ "date", il doit être égal à la date de valorisation.
     """
-    points = _points(_champ(d, "points", chemin), "taux_pct", f"{chemin}.points")
-    if not points:
-        return None
+    fichier: Path | None = None
+    if isinstance(d, Mapping) and d.get("fichier") is not None:
+        if _champ(d, "type_taux", chemin) != "df":
+            raise ErreurConfig(f"{chemin} : une courbe lue dans un fichier doit avoir \"type_taux\": \"df\"")
+        fichier = Path(_texte(d["fichier"], f"{chemin}.fichier"))
+        if not fichier.is_absolute():
+            if racine is None:
+                raise ErreurConfig(f"{chemin}.fichier : chemin relatif sans racine de projet")
+            fichier = racine / fichier
+        points = lire_facteurs_fichier(
+            fichier,
+            _texte(d.get("colonne_temps", "t"), f"{chemin}.colonne_temps"),
+            _texte(_champ(d, "colonne_df", chemin), f"{chemin}.colonne_df"),
+        )
+    else:
+        points = _points(_champ(d, "points", chemin), "taux_pct", f"{chemin}.points")
+        if not points:
+            return None
+        if isinstance(d, Mapping) and d.get("type_taux") == "df":
+            raise ErreurConfig(f"{chemin} : type_taux \"df\" uniquement avec un champ \"fichier\"")
     if date_valo is not None and d.get("date") is not None:
         date_courbe = _date(d["date"], f"{chemin}.date")
         if date_courbe != date_valo:
@@ -392,6 +455,7 @@ def lire_courbe(
         source=_texte(_champ(d, "source", chemin), f"{chemin}.source"),
         hypothese=hypothese,
         convention=None if convention is None else _texte(convention, f"{chemin}.convention"),
+        fichier=fichier,
     )
 
 
@@ -695,10 +759,12 @@ def valider_marche(brut: Mapping[str, Any], config: ConfigValo) -> MarcheFX:
     courbes = _champ(brut, "courbes", "marche")
     dv = config.date_valorisation
     courbe_eur = lire_courbe(
-        _champ(courbes, "EUR", "marche.courbes"), "EUR", "marche.courbes.EUR", hypothese=False, date_valo=dv
+        _champ(courbes, "EUR", "marche.courbes"), "EUR", "marche.courbes.EUR",
+        hypothese=False, date_valo=dv, racine=config.racine,
     )
     courbe_usd = lire_courbe(
-        _champ(courbes, "USD", "marche.courbes"), "USD", "marche.courbes.USD", hypothese=False, date_valo=dv
+        _champ(courbes, "USD", "marche.courbes"), "USD", "marche.courbes.USD",
+        hypothese=False, date_valo=dv, racine=config.racine,
     )
     terme = lire_points_de_terme(
         brut.get("points_de_terme", {"points": []}), "marche.points_de_terme", hypothese=False

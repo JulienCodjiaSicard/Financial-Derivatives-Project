@@ -7,8 +7,7 @@ Carlo et l'analyse historique de la barrière, puis écrit A_LIRE.md.
 
 Fichiers écrits dans resultats_fx/ : coupons_fx.csv, coupons_fx_probabilites.svg,
 sensibilites_fx.csv, export_mc.json, historique_barriere_fx.csv / .svg,
-vol_historique_vs_implicite_fx.csv, A_LIRE.md. Les fichiers 01_ à 04_ et A_LIRE.txt
-(script initial pricing_fx.py) ne sont pas touchés.
+vol_historique_vs_implicite_fx.csv, A_LIRE.md.
 
 Exécution : python scripts/run_all.py [chemin_config]
 """
@@ -44,7 +43,7 @@ from fx.rapport import EntreesRapport, generer_a_lire  # noqa: E402
 from fx.smile import construire_surface  # noqa: E402
 from fx.vol_effective import vols_effectives  # noqa: E402
 
-CONFIG_DEFAUT = RACINE / "config" / "valo_2026-11-06.json"
+CONFIG_DEFAUT = RACINE / "config" / "valo_2026-11-13.json"
 
 
 def main(argv: list[str]) -> int:
@@ -79,7 +78,7 @@ def main(argv: list[str]) -> int:
     # Étape 2 : courbes et forward aux dates de coupon.
     courbes = construire_courbes(contexte.marche, config)
     for c in (courbes.eur, courbes.usd):
-        print(f"Courbe {c.devise} : {len(c.temps) - 1} nœuds jusqu'à {c.t_max:.2f} ans ; "
+        print(f"Courbe {c.devise} : {len(c.temps) - 1} nœuds jusqu'à {c.t_max:.2f} ans ; source : {c.source} ; "
               f"taux de swap interpolés : {', '.join(c.piliers_interpoles) or 'aucun'}")
     print(f"\n{'n°':>3} {'date':>10} {'T':>7} {'DF EUR':>8} {'DF USD':>8} {'r_EUR':>6} {'r_USD':>6} {'écart':>6} {'forward':>7}")
     for c in echeancier_coupons(config):

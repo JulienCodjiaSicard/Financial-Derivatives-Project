@@ -31,10 +31,17 @@ def charger_run_all():
 def sortie(tmp_path_factory):
     """Exécute run_all avec une copie de la config qui écrit dans un dossier temporaire."""
     tmp = tmp_path_factory.mktemp("valo")
-    brut = lire_json(RACINE / "config" / "valo_2026-11-06.json")
+    brut = lire_json(RACINE / "config" / "valo_2026-11-13.json")  # config par défaut de run_all
     for cle in ("fixings_bce", "marche", "historique_bce"):
         brut["chemins"][cle] = str(RACINE / brut["chemins"][cle])
     brut["chemins"]["resultats"] = str(tmp / "resultats_fx")
+    # Fichier de marché recopié avec des chemins de courbes absolus (ils sont relatifs à la racine du projet)
+    marche = lire_json(Path(brut["chemins"]["marche"]))
+    for dev in ("EUR", "USD"):
+        if marche["courbes"][dev].get("fichier"):
+            marche["courbes"][dev]["fichier"] = str((RACINE / marche["courbes"][dev]["fichier"]).resolve())
+    (tmp / "marche.json").write_text(json.dumps(marche, ensure_ascii=False), encoding="utf-8")
+    brut["chemins"]["marche"] = str(tmp / "marche.json")
     (tmp / "config").mkdir()
     chemin = tmp / "config" / "valo_test.json"
     chemin.write_text(json.dumps(brut, ensure_ascii=False), encoding="utf-8")
@@ -77,7 +84,7 @@ def test_a_lire_contenu(sortie):
         assert section in texte, section
     for mot in ("K = 1,1770", "07/05/2026", "coupon_par_periode", "bf25_manquant", "vols_au_dela_dernier_pilier",
                 "plus haut intrajournalier", "cross-currency", "corrélation taux/change", "Vanna-Volga",
-                "fixing BCE du 19/11/2026", "12 dates sur 14"):
+                "fixing BCE du 19/11/2026", "12 dates sur 14", "sous-groupe taux", "Courbes sans OIS", "13/11/2026"):
         assert mot in texte, mot
     assert len(re.findall(r"^\| \d+ \| \d{2}/\d{2}/\d{4} \|", texte, flags=re.M)) == 14
     assert "nan" not in texte.lower().replace("nanc", "")

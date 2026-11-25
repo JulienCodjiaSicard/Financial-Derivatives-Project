@@ -1,0 +1,91 @@
+{
+  "date_valorisation": "2026-11-13",
+  "chemins": {
+    "fixings_bce": "data/eurusd_bce_2026-05-06_2026-11-13.csv",
+    "marche": "data/marche_2026-11-13.json",
+    "historique_bce": "data/bce_historique_EXR.D.USD.EUR.SP00.A_2026-11-19.csv",
+    "resultats": "resultats_fx"
+  },
+  "export_mc": {
+    "sigma_eff_maturite_max_annees": 2.0,
+    "tolerance_controle_moteur_points": 1.0,
+    "commentaire": "Seule la barrière effective (fx_barrier, une valeur par date, à vol ATM de marché) est livrée au moteur. La vol effective est mal posée quand F est proche de K (deux racines, aucune réaliste) : elle n'est exportée qu'à titre d'information jusqu'à cette maturité. Tolérance du test de contrôle à faire tourner dans le moteur commun (taux EUR stochastiques dans le moteur, déterministes ici)."
+  },
+  "historique": {
+    "sous_periode_annees": 10,
+    "vol_realisee_jours": {
+      "1M": 21,
+      "3M": 63,
+      "6M": 126,
+      "1Y": 252
+    },
+    "jours_ouvres_par_an": 252,
+    "commentaire": "Historique BCE téléchargé le 19/11/2026 (format SDMX CSV, portail de données BCE). Seuls les fixings jusqu'à la date de valorisation sont utilisés. Fenêtres glissantes quotidiennes ; fixing de fin = dernier fixing publié à la date d'échéance ou avant."
+  },
+  "barriere": {
+    "debut_observation": "2026-05-06",
+    "fin_observation": "2026-11-06",
+    "source": "fixing BCE quotidien (EXR.D.USD.EUR.SP00.A)",
+    "commentaire": "Question ouverte : K pris sur le fixing BCE ou sur le plus haut intrajournalier, à confirmer par le professeur."
+  },
+  "note": {
+    "nominal_eur": 50000000,
+    "maturite_annees": 7,
+    "frequence_coupons_par_an": 2,
+    "coupon_par_periode": {
+      "valeur": 0.07,
+      "hypothese": true,
+      "justification": "Lecture '7 % par semestre' reprise du script initial. La lecture '7 % par an' (0,035 par semestre) n'est pas tranchée par le professeur."
+    },
+    "date_depart_coupons": {
+      "valeur": "2026-11-13",
+      "hypothese": true,
+      "justification": "Date d'émission non communiquée : échéancier compté depuis la date de valorisation commune (13/11/2026), comme les dates t = 0,5 ... 7 ans du sous-groupe taux (output/discount_coupon_dates.csv)."
+    }
+  },
+  "conventions": {
+    "base_calcul": "ACT/365F",
+    "paire": "EURUSD",
+    "devise_prime": "USD",
+    "delta_ajuste_prime": false,
+    "delta_spot_jusqu_a_annees": 1.0,
+    "atm": "DNS",
+    "interpolation_courbes": {
+      "facteurs_actualisation": "log_lineaire",
+      "taux_swap_manquants": "lineaire",
+      "commentaire": "Courbes du sous-groupe taux lues en facteurs d'actualisation (type df) : interpolation log-linéaire entre leurs nœuds mensuels, identique à leur Curve.P_at. Leurs maturités sont des années, utilisées directement comme temps t (ACT/365F depuis le 13/11/2026 pour les dates de coupon ; écart de quelques jours au plus, effet sur les DF de l'ordre de 1e-4)."
+    }
+  },
+  "smile": {
+    "methode": "vanna_volga",
+    "ordre_vanna_volga": 2,
+    "sabr_beta": 1.0,
+    "commentaire": "Vanna-Volga de Castagna-Mercurio (ordre 2 si stable, sinon passer à 1). SABR calibré sur les trois piliers, pour comparaison ; beta fixé à 1 (lognormal), alpha, rho et nu calibrés. Interpolation en temps sur la variance totale, à delta constant."
+  },
+  "sensibilites": {
+    "spot_pct": 1.0,
+    "vol_atm_pts": 1.0,
+    "rr25_pts": 0.5,
+    "bf25_pts": 0.1,
+    "ecart_taux_bp": 10.0,
+    "barriere_k": 0.01,
+    "commentaire": "Chocs centrés (±), résultat rapporté pour le choc +. Vols à delta constant quand le spot bouge (sticky delta). Écart de taux : choc parallèle des taux zéro USD (courbe Treasury du sous-groupe taux), courbe EUR inchangée."
+  },
+  "hypotheses_marche": {
+    "bf25_manquant": {
+      "valeur_pct": 0.2,
+      "plage_sensibilite_pct": [
+        0.15,
+        0.25
+      ],
+      "hypothese": true,
+      "justification": "Aucun butterfly 25 delta disponible. Milieu de la fourchette 0,15 à 0,25 point de vol retenue dans le plan ; sensibilité au BF prévue à l'étape 6."
+    },
+    "vols_au_dela_dernier_pilier": {
+      "methode": "vol_constante",
+      "hypothese": true,
+      "justification": "Aucune vol cotée au-delà de 1 an (source Saxo). Extrapolation à vol constante prévue par le plan, à remplacer par des cotations (Bloomberg OVDV) si disponibles."
+    }
+  },
+  "commentaire_date": "Date de valorisation commune avec le sous-groupe taux (VAL_DATE de code/curves.py, date de hw_params.json). La config du 06/11/2026 (courbes €STR / SOFR BlueGamma) est gardée pour comparaison."
+}

@@ -18,7 +18,7 @@ N(−d1(σ)) = P_smile a deux racines et aucune n'est réaliste (17,8 % ou 0,6 %
 Elle n'est reportée, à titre d'information, que jusqu'à config.sigma_eff_max_annees.
 
 Validité : simulation lognormale de l'EUR/USD sous la mesure risque-neutre EUR, avec les
-mêmes courbes €STR et SOFR. Le moteur simule des taux EUR stochastiques (Hull-White) : un
+mêmes courbes EUR et USD (celles du fichier de marché : sous-groupe taux au 13/11/2026). Le moteur simule des taux EUR stochastiques (Hull-White) : un
 petit écart sur les probabilités est normal, plus d'un point signalerait un problème de
 convention (bloc "controle_moteur").
 """
@@ -78,6 +78,7 @@ def construire_export(
             "fx_atm_vols": [v.vol_atm for v in vols],
             "fx_barrier": [v.k_effective_vol_atm for v in vols],
             "usd_ois": courbe_au_format_moteur(courbes.usd, t_coupons),
+            "indice_courbe_usd": marche.courbe_usd.indice if marche.courbe_usd is not None else "implicite (points de terme)",
             "changement_moteur": (
                 "fx_barrier contient une barrière par date de coupon. Dans pricer_note_ece.py, remplacer la "
                 f"comparaison au K unique par : {CHANGEMENT_MOTEUR}"
@@ -85,12 +86,14 @@ def construire_export(
             "note": (
                 "fx_atm_vols contient les vols ATM de marché aux dates de coupon ; fx_barrier la barrière "
                 "effective qui, à ces vols, redonne la probabilité avec smile. usd_ois : taux zéro continus "
-                "en décimal, maturités en années (format Curve(tenors, zeros))."
+                "en décimal, maturités en années (format Curve(tenors, zeros)) ; nom de clé gardé pour le moteur, "
+                "la courbe réellement utilisée est indiquée dans indice_courbe_usd."
             ),
         },
         "reference_eur_ois_sous_groupe_fx": {
             **courbe_au_format_moteur(courbes.eur, t_coupons),
-            "note": "Courbe €STR utilisée ici, au même format, pour comparaison avec eur_ois du moteur : "
+            "indice": marche.courbe_eur.indice,
+            "note": "Courbe EUR utilisée ici, au même format, pour comparaison avec eur_ois du moteur : "
                     "si elle diffère, le forward et donc les probabilités diffèrent.",
         },
         "controle_moteur": {

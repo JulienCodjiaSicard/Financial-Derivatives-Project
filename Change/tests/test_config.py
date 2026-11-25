@@ -116,12 +116,6 @@ def test_fixings_date_en_double_erreur(tmp_path):
         lire_fixings_bce(f)
 
 
-def test_copie_data_identique_au_csv_historique():
-    """data/ contient une copie du CSV racine utilisé par pricing_fx.py (référence)."""
-    original = (RACINE / "eurusd_bce_2026-05-06_2026-11-06.csv").read_bytes()
-    assert (RACINE / "data" / "eurusd_bce_2026-05-06_2026-11-06.csv").read_bytes() == original
-
-
 # --- Config ----------------------------------------------------------------------------
 
 

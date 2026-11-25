@@ -128,7 +128,7 @@ def test_export_json_livre_la_barriere_effective(export, vols):
     sorties = vols[0]
     assert export["date_valorisation"] == "2026-11-06" and export["barriere_K"] == pytest.approx(1.1770)
     pm = export["pour_pricer_note_ece"]
-    assert set(pm) == {"fx_spot", "fx_vol_tenors", "fx_atm_vols", "fx_barrier", "usd_ois", "changement_moteur", "note"}
+    assert set(pm) == {"fx_spot", "fx_vol_tenors", "fx_atm_vols", "fx_barrier", "usd_ois", "indice_courbe_usd", "changement_moteur", "note"}
     assert pm["fx_spot"] == pytest.approx(1.1165)
     assert pm["fx_vol_tenors"] == pytest.approx([v.t for v in sorties])
     assert pm["fx_atm_vols"] == pytest.approx([v.vol_atm for v in sorties])  # vols de marché, pas σ_eff

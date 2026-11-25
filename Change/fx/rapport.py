@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Mapping, Sequence
 
-from fx.config import ContexteValo
+from fx.config import ContexteValo, MarcheFX
 from fx.courbes import CourbesFX
 from fx.digitales import ResultatCoupon
 from fx.historique import AnalyseHistorique
@@ -47,6 +47,18 @@ class EntreesRapport:
     date_generation: date
     # Dates (historique complet, au-delà de la valo) où le fixing BCE égale le spot de référence des vols
     dates_fixing_egal_spot_vols: tuple[date, ...] = ()
+
+
+def courbes_du_groupe_taux(marche: MarcheFX) -> bool:
+    """Vrai si les courbes EUR et USD sont les facteurs d'actualisation du sous-groupe taux."""
+    return all(c is not None and c.type_taux == "df" for c in (marche.courbe_eur, marche.courbe_usd))
+
+
+def libelle_ecart(marche: MarcheFX) -> str:
+    """Nom de l'écart de taux USD − EUR selon les courbes utilisées."""
+    if courbes_du_groupe_taux(marche):
+        return "Treasury − Euribor 6M (courbes du sous-groupe taux)"
+    return "SOFR − €STR"
 
 
 LIBELLES_SENSIBILITES = {
@@ -98,7 +110,7 @@ def generer_a_lire(e: EntreesRapport) -> str:
     a(f"- Probabilité de paiement de la condition de change (mesure EUR, avec smile) : "
       f"{pct(res[0].p_smile, 1)} au premier coupon, {pct(res[1].p_smile, 1)} à 1 an, "
       f"{pct(res[-1].p_smile, 1)} à 7 ans. Le forward EUR/USD franchit K vers 4 ans, poussé par "
-      f"l'écart de taux SOFR − €STR (environ {nombre(1e4 * e.courbes.ecart_taux(1.0))} bp à 1 an).")
+      f"l'écart de taux {libelle_ecart(marche)} (environ {nombre(1e4 * e.courbes.ecart_taux(1.0))} bp à 1 an).")
     a(f"- Le smile retire {nombre(total['plate'] - total['smile'])} EUR "
       f"({pct(total['smile'] / total['plate'] - 1, 1)}) à la valeur à vol plate. "
       f"Injecter σ(K) dans N(−d1) ne corrige presque rien ({'+' if total['volk'] >= total['plate'] else ''}{nombre(total['volk'] - total['plate'], 0)} EUR) : "
@@ -118,6 +130,12 @@ def generer_a_lire(e: EntreesRapport) -> str:
     for cb in (marche.courbe_eur, marche.courbe_usd):
         if cb is None:
             continue
+        if cb.type_taux == "df":
+            courbe = e.courbes.eur if cb.devise == "EUR" else e.courbes.usd
+            pts = ", ".join(f"{n} an{'s' if n > 1 else ''} {pct(courbe.taux_zero(n))}" for n in (1, 2, 3, 5, 7))
+            a(f"| Courbe {cb.devise} ({cb.indice}), taux zéro continus | {pts} | {cb.source} | "
+              f"{jj_mm_aaaa(cfg.date_valorisation)} |")
+            continue
         pts = ", ".join(f"{p.pilier} {nombre(p.valeur, 2)}" for p in cb.points)
         a(f"| Courbe {cb.devise} ({cb.indice}), taux de swap en % | {pts} | {cb.source.split(' (')[0]} | "
           f"{jj_mm_aaaa(cfg.date_valorisation)} |")
@@ -136,8 +154,13 @@ def generer_a_lire(e: EntreesRapport) -> str:
         a(f"- **{h.nom}** = `{h.valeur}` : {h.justification}")
     a("")
     a("Choix de méthode :\n")
-    a("- Courbes : bootstrap des swaps OIS au pair (jambe fixe annuelle ACT/360), DF interpolés en log-linéaire, "
-      "taux de swap des échéances annuelles non cotées (4, 6, 8, 9 ans) interpolés linéairement.")
+    if courbes_du_groupe_taux(marche):
+        a("- Courbes : facteurs d'actualisation du sous-groupe taux repris tels quels (EUR : swaps Euribor 6M en "
+          "courbe unique ; USD : par yields Treasury, proxy SOFR), interpolés en log-linéaire comme dans leur code : "
+          "on retrouve exactement leurs P_eur et P_usd aux dates t = 0,5 ... 7 ans. Forward F(T) = S · DF_EUR / DF_USD.")
+    else:
+        a("- Courbes : bootstrap des swaps OIS au pair (jambe fixe annuelle ACT/360), DF interpolés en log-linéaire, "
+          "taux de swap des échéances annuelles non cotées (4, 6, 8, 9 ans) interpolés linéairement.")
     a(f"- Smile : piliers σ_25P/C = ATM + BF ∓ RR/2 ; interpolation en strike par {'Vanna-Volga' if cfg.methode_smile == 'vanna_volga' else 'SABR'} "
       f"d'ordre {cfg.ordre_vanna_volga} (Castagna-Mercurio), SABR β = {nombre(cfg.sabr_beta, 1)} en comparaison ; "
       "interpolation en temps sur la variance totale à delta constant.")
@@ -189,8 +212,8 @@ def generer_a_lire(e: EntreesRapport) -> str:
       "Elle est unique, car la probabilité croît strictement avec K ;")
     a("- `usd_ois` au format `Curve(tenors, zeros)` du moteur : maturités en années, taux zéro continus en décimal "
       "(interpolés linéairement par le moteur). Les dates de coupon sont incluses, donc le moteur retrouve exactement "
-      "nos facteurs d'actualisation USD à ces dates. La courbe €STR utilisée ici est jointe au même format, pour "
-      "comparaison avec `eur_ois`.\n")
+      "nos facteurs d'actualisation USD à ces dates. La courbe EUR utilisée ici "
+      f"({marche.courbe_eur.indice}) est jointe au même format, pour comparaison avec `eur_ois`.\n")
     a("**Changement d'une ligne dans `pricer_note_ece.py`**, à demander au sous-groupe moteur : comparer à la barrière "
       "de chaque date au lieu d'un K unique, `ok_fx = sim[\"fx\"] < np.asarray(terms.fx_barrier).reshape(-1, 1)`.\n")
     a(f"**Test de contrôle** (bloc `controle_moteur`) : faire tourner le moteur sur la seule condition de change ; il doit "
@@ -247,8 +270,7 @@ def generer_a_lire(e: EntreesRapport) -> str:
         ("A_LIRE.md", "ce document"),
     ):
         a(f"- `{nom}` : {desc}.")
-    a("\nLes fichiers numérotés `01_` à `04_` et `A_LIRE.txt` viennent du script initial `pricing_fx.py` "
-      "(taux EUR et USD à 3 %, vol plate, 2 dates) et sont conservés pour mémoire.\n")
+    a("")
 
     # --- Limites
     a("## Limites\n")
@@ -273,6 +295,12 @@ def generer_a_lire(e: EntreesRapport) -> str:
         "BF coté traité comme un smile strangle alors que le marché cote un market strangle (écart faible ici, |RR| < 1 point).",
         "Approximation Vanna-Volga de Castagna-Mercurio (SABR donne moins de 0,02 point d'écart en K).",
         "Taux USD et EUR déterministes ; corrélation taux/change non modélisée ici (traitée, le cas échéant, par le moteur commun).",
+        *((
+            "**Courbes sans OIS** (pas d'accès dans le groupe) : EUR Euribor 6M au lieu de l'€STR, USD Treasury au lieu "
+            "du SOFR. Le forward de change en dépend directement (parité des taux) ; une couverture de marché se ferait "
+            f"sur les courbes OIS. Ordre de grandeur : {nombre(sens.total('ecart_taux'))} EUR par "
+            f"+{nombre(1e4 * c.ecart_taux, 0)} bp d'écart de taux USD − EUR.",
+        ) if courbes_du_groupe_taux(marche) else ()),
         "Courbe unique par devise (pas de base cross-currency) ; swaps supposés démarrer à la date de valorisation (pas de T+2).",
         date_vols,
         "K à confirmer : fixing BCE retenu ; un plus haut intrajournalier donnerait un K plus élevé "
@@ -290,11 +318,15 @@ def generer_a_lire(e: EntreesRapport) -> str:
         "Coupon : 7 % par an (3,5 % par semestre) ou 7 % par semestre ? (valeurs calculées avec "
         f"{pct(cfg.coupon_par_periode, 1)} par date)",
         "K : fixing BCE ou plus haut intrajournalier ?",
-        "Date de valorisation commune à tout le groupe (ici le 06/11/2026, fin de la fenêtre de la barrière).",
+        (f"Date de valorisation : le {jj_mm_aaaa(cfg.date_valorisation)}, alignée sur le sous-groupe taux ; "
+         "à confirmer avec les sous-groupes crédit et moteur."
+         if courbes_du_groupe_taux(marche) else
+         f"Date de valorisation commune à tout le groupe (ici le {jj_mm_aaaa(cfg.date_valorisation)}, fin de la fenêtre de la barrière)."),
         "Source des vols au-delà de 1 an, en priorité les risk reversals, puis les butterflies (Bloomberg OVDV si "
         "l'école y donne accès) ; vols à la date de valorisation plutôt qu'au 19/11.",
         "Sous-groupe moteur : accepter une barrière par date (changement d'une ligne ci-dessus), faire tourner le test "
-        "de contrôle, et vérifier que `eur_ois` du moteur correspond à la courbe €STR utilisée ici.",
+        "de contrôle, et vérifier que `eur_ois` du moteur correspond à la courbe EUR utilisée ici "
+        f"({marche.courbe_eur.indice}).",
     ):
         a(f"- {q}")
     a("")
