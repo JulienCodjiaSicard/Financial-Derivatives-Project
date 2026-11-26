@@ -1,0 +1,8 @@
+hypothese,modele,realise,commentaire
+Vol EUR/USD (annuelle),0.0660743,0.0498429,vol implicite ATM 6M (13/11) contre vol réalisée des fixings BCE
+Rendements hebdo EUR/USD hors IC 95 % du modèle,0.05,0,"part des semaines où |rendement| > 1,96 vol implicite"
+Vol normale du swap EUR 2 ans (bp/an),82.6821,64.9029,Hull-White (σ_r moyen de la période) contre variations journalières réalisées
+Vol normale du swap EUR 5 ans (bp/an),79.4784,64.5914,Hull-White (σ_r moyen de la période) contre variations journalières réalisées
+Vol normale du swap EUR 7 ans (bp/an),77.4349,60.2759,Hull-White (σ_r moyen de la période) contre variations journalières réalisées
+Corrélation taux EUR / X = 1/FX,0.316546,0.185071,"swap 2 ans contre ln X, variations journalières sur la période"
+Défauts dans le panier de banques EUR,0.0105469,0,probabilité de défaut à 6 mois à l'émission contre défaut observé

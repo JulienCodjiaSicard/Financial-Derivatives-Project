@@ -1,0 +1,10 @@
+facteur,choc,variation_note_EUR,variation_note_bp_nominal,variation_sans_call_EUR,convexite_EUR
+Taux EUR (€STR),+1 bp parallèle,-11036.4,-2.20727,-13932.9,960.024
+Taux USD (SOFR),+1 bp parallèle,-11537.4,-2.30748,-17141.1,641.72
+Vol des taux sigma_r,+10 bp,6672.33,1.33447,2136.56,-8838.2
+Retour à la moyenne a,+1 %,-655.771,-0.131154,-840.784,-125.245
+Spot EUR/USD,+1 %,-475829,-95.1659,-584613,-30014.6
+Vol EUR/USD,+1 point,-216004,-43.2008,-159353,47080
+Corrélation taux / change,+0.10,77212.2,15.4424,-3517.58,-3432.17
+Intensité de défaut des banques EUR,+10 bp,-14299.1,-2.85982,-29648.9,48.8516
+Barrière EUR/USD,+0.01,409745,81.9491,500823,-18810.2

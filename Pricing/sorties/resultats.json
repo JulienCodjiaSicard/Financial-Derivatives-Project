@@ -1,0 +1,33 @@
+{
+  "date_valorisation": "2026-11-13",
+  "nominal_EUR": 50000000.0,
+  "maturite_annees": 7.0,
+  "marge": 0.015,
+  "coupon_annuel_avec_call": 0.0671721084974706,
+  "coupon_annuel_sans_call": 0.06103338714788609,
+  "V0_EUR": 49249999.97506665,
+  "erreur_standard_V0_EUR": 7705.42099327411,
+  "V0_sans_call_EUR": 50201473.32659422,
+  "capital_actualise_EUR": 40155743.345,
+  "option_banque_EUR": 951473.3515275748,
+  "erreur_standard_option_EUR": 6743.95992232351,
+  "proba_remboursement_anticipe": 0.48982,
+  "taux_souverain_7y": 0.032469227363,
+  "spot_eurusd": 1.1052,
+  "barriere_x": 1.177,
+  "hull_white": {
+    "a": 0.02676367293524543,
+    "sigma_r": 0.009318465936525334
+  },
+  "rho_taux_X": 0.31654562648067036,
+  "nb_scenarios_par_jeu": 100000,
+  "sources": {
+    "EUR/USD": "Change : fixings BCE 2026-05-06 au 2026-11-13",
+    "courbe EUR": "Taux : OIS €STR (courbes_20261113.csv)",
+    "courbe USD": "Taux : OIS SOFR (courbes_20261113.csv)",
+    "taux souverain 7 ans": "BCE souverains AAA zone euro (2026-11-13)",
+    "a, sigma_r": "Taux : Hull-White sur swaptions co-terminales 7Y (a = 2.68%, sigma_r = 93 bp)",
+    "vols FX, barrières, rho": "Change : vols ATM 6.61% à 6.76%, barrières effectives (smile) 1.1813 à 1.1498, rho(taux, X) = 0.32",
+    "survie": "Crédit : panier de banques EUR, scénario tail_1x"
+  }
+}

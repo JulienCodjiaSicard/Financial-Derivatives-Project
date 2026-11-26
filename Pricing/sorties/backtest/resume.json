@@ -1,0 +1,21 @@
+{
+  "emission": "2026-05-15",
+  "fin": "2026-11-13",
+  "barriere": 1.1974,
+  "coupon_C0": 0.07446551425382493,
+  "V_emission_EUR": 49249999.98227922,
+  "V_fin_EUR": 52587379.54337332,
+  "pnl_total_EUR": 3337379.561094098,
+  "part_variance_pnl_expliquee": 0.9910593407647718,
+  "erreur_moyenne_absolue_EUR": 27601.068006063728,
+  "pnl_hebdo_moyen_absolu_EUR": 275325.8594646875,
+  "premier_coupon": {
+    "date_fixing": "2026-11-15",
+    "proba_fx_a_l_emission": 0.70635,
+    "survie_a_l_emission": 0.9894530540009546,
+    "eurusd_au_13_11": 1.1052,
+    "barriere_effective": 1.201770773803975,
+    "condition_fx_respectee_au_13_11": true
+  },
+  "nb_scenarios_par_jeu": 40000
+}
