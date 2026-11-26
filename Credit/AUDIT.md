@@ -2,7 +2,42 @@
 
 **STATUT 2 — CREDIT FINALIZED WITH MODEL CONVENTION LIMITATIONS.** Le module Crédit autonome est gelé. **Option B** pour les spreads Tradeweb. La convention de marché de conversion en par, les clauses exactes des contrats et l’intégration avec les autres équipes restent à confirmer. [Audit du spread](AUDIT_SPREAD_TRADEWEB.md) · [Notice d’intégration](INTEGRATION_PRICING.md).
 
-## Validation finale du livrable
+## Audit ING5 · Panier systémique et condition de crédit
+
+| Contrôle | Résultat |
+|---|---|
+| Version de départ | Archive validée, SHA-256 `6e198274c1aa475f593827688d97af5f79fe2b7d438104d75f1b008c7c5e720e`. Les 60 tests initiaux passent sous Windows et Python 3.12.10 dans le venv du projet. |
+| Éligibilité | Un G-SIB et deux O-SII identifiés par des publications antérieures au 20 mai 2026. Même date, maturité exacte, devise et séniorité. Les six séances de contrôle supplémentaires donnent zéro nouveau rapprochement éligible. |
+| Repricing | Quadrature indépendante des deux jambes au spread d’entrée, prime échue et accrual au défaut, ACT/365F. Erreur absolue maximale inférieure à 0,01 pb pour les quatre tickets de référence. Option B académique. Les benchmarks QuantLib préexistants contrôlent notamment les écarts ACT/360 et les conventions calendaires. |
+| Courbes | Intensités du panier de 0,6460 %, 0,6803 % et 0,7943 % par an, recouvrement subordonné de 20 %. BNP senior à 0,6605 % avec recouvrement de 40 %. |
+| Validation du panier | PD indépendante de 6,34 % au pilier commun de 3,0877 ans et d’environ 13,80 % à 7 ans avec prolongement central. À 7 ans, la plage des trois prolongements est de 10,14 % à 17,30 %. |
+| Monte Carlo | 4 096 tirages pour le recalage des dynamiques et une graine distincte pour chaque rôle. 4 000 ou 12 000 trajectoires, pas maximal de 3 ou 6 mois, pilier exact inséré. Plus grand écart marginal absolu de 0,47 point de pourcentage, 2,39 erreurs-types empiriques. |
+| Coupon | 14 dates. Masque strict `tau_first > t`, état absorbant. Le scénario indépendant central donne 86,21 % de survie et 3,02 de coupon espéré au 14e semestre, par 100 à 7 % annuel. |
+| Chocs à 7 ans | PD de 19,25 % à +25 pb partout, 15,65 % avec +25 pb sur le seul pilier Société Générale, 33,64 % à +100 pb. À +25 pb partout, le dernier coupon espéré tombe à 2,83. |
+| Historique | 21 observations rapprochées, 18 dates entre mai et juillet, 1 date complète du panier. Aucun test prédictif de marché possible avec cette couverture. Le replay DEMO de 28 dates et les résultats historiques réels discontinus restent disponibles. |
+
+Les [preuves ING5](outputs/systemic/) contiennent les sources bibliographiques, les distances à la tolérance, les distributions de défaut, les calculs aux 14 dates et la convergence. La volatilité historique et la corrélation empirique restent indisponibles, avec une ou deux dates simultanées selon les paires. Les paramètres Cox lognormal et CIR++ documentent des scénarios. À 7 ans, la variation du premier défaut entre scénarios de facteur est petite devant l’erreur-type d’environ 0,32 point. Les fréquences de deux défauts augmentent légèrement de 0,69 % à 0,81 % entre les chargements lognormaux faible et fort.
+
+### Conventions du coupon
+
+Le projet de groupe, `Projet.pdf`, §1.2 p. 2 et §3.1 p. 3, appuie la lecture « aucune banque n’a fait défaut à la date ». Les supports consultés donnent une périodicité semestrielle et un coupon annualisé multiplié par 0,5 dans cette lecture. Le seuil de PD évoqué oralement ne spécifie aucune convention contractuelle utilisable. Le taux de 7 % est une hypothèse illustrative et le choix annuel ou par semestre est explicite. La seule contribution Crédit est livrée à Pricing. Voir le [schéma des trajectoires et masques](INTEGRATION_PRICING.md).
+
+L’actualisation €STR provient de quatre strips reconstruits déjà audités. Le montant actualisé des seuls coupons est produit quand la courbe va jusqu’au dernier semestre. Au repricing, l’upfront signé, la direction et le notionnel non plafonné nécessaires à la réconciliation du ticket réel manquent. Les repos, la liquidité, la prime de risque et la séniorité peuvent influer sur le spread, de sorte que les PD extraites sont risque-neutres et dépendent du recouvrement.
+
+Le premier essai de baseline a utilisé un environnement auxiliaire auquel il manquait `openpyxl`. La baseline et la validation de livraison ont ensuite tourné dans le Python 3.12.10 du projet avec toutes les dépendances. Les tests et rejouages de la version réintégrée sont récapitulés dans [le registre ING5](outputs/systemic/validation_ing5.json).
+
+### Inventaire des changements ING5
+
+- Code modifié. `credit_engine.py`, `app.py`, `test_credit.py`.
+- Documentation modifiée. `README.md`, `AUDIT.md`, `SYNTHESE.md`, `INTEGRATION_PRICING.md`, `RECHERCHE_SOURCES.md`.
+- Fichiers ajoutés à la racine. `GUIDE_SOUTENANCE.md` et `.gitignore`.
+- Registres ajoutés. `data/market/systemic_banks_verified.csv` et `data/market/cds_source_audit.csv`.
+- Calibration et historique ajoutés dans `outputs/systemic/`. `systemic_basket_repricing.csv`, `bnp_senior_alternative_repricing.csv`, `observed_credit_history.csv`, `history_coverage.csv`, `history_pair_overlap.csv`.
+- Coupon et simulation ajoutés dans `outputs/systemic/`. `bnp_senior_semesters.csv`, `coupon_banks.csv`, `coupon_semesters.csv`, `coupon_dependence.csv`, `dependence_and_convergence.csv`, `mc_marginals.csv`, `pricing_credit_paths.npz`.
+- Preuves et métadonnées ajoutées dans `outputs/systemic/`. `additional_source_checks.json`, `options_search.json`, `systemic_study.json`, `validation_ing5.json`.
+- Les 16 CSV DEMO, quatre CSV de replay transactionnel et cinq CSV de sensibilité aux taux ont été recalculés avec les deux versions, dans le même environnement. Les données coïncident exactement hors chronométrage. Les 17 anciens CSV d’entrée et les quatre précédentes archives ZIP ont aussi été vérifiés par empreinte.
+
+## Validation finale de la version précédente
 
 ### 1 · Périmètre et baseline
 
@@ -78,7 +113,7 @@ L’archive initiale ECE_2026_Module_Credit.zip reste disponible dans le dossier
 
 Le run de l’archive a reproduit **16 tableaux sur 16**, avec un écart numérique nul sur les valeurs publiées, hors champs de temps. Les deux cas QuantLib alignés concordent à l’identique. Le résidu CDS maximal initial était de \(1,9611\times10^{-12}\) pb, la PD de panier à 7 ans de 25,3829 %, le replay de 28 dates. Les spreads joints de référence ont été reproduits autour de 82,350 / 80,788 / 79,249 pb pour \(\rho=-0,55/0/+0,55\). L’expérience finale utilise un protocole apparié différent. Les prix déterministes et les scénarios historiques comparables sont contrôlés dans [baseline_reproduction.json](outputs/baseline_reproduction.json).
 
-**Éléments conservés**. Intégration analytique du CDS, survie par intensité déterministe par morceaux, bootstrap strict, modèles CIR++ et lognormal, seuils exponentiels du basket, attente d’innovations externes, pricer joint, stress, moteur du backtest, trois onglets Streamlit et trois fichiers Python. Le cours principal slides 75–80 et les notes Niels pages 19–25 confirment la logique de modèle à intensité et d’équilibrage des jambes. Les quatre PDF et les photos de la mission initiale ont été accessibles. Le document collectif retrouvé dans Drive reproduit les consignes et retranscrit un payoff proposé par le professeur. [Document collectif Projet Dérivés Financiers](https://docs.google.com/document/d/1Yg0hNqUo4R8GrCcK2zDNHaP9awqGlFp94GeHCh_12S0/edit)
+**Éléments conservés**. Intégration analytique du CDS, survie par intensité déterministe par morceaux, bootstrap strict, modèles CIR++ et lognormal, seuils exponentiels du basket, attente d’innovations externes, pricer joint, stress, moteur du backtest, trois onglets Streamlit et trois fichiers Python. Le cours principal slides 75–80 et les notes Niels pages 19–25 confirment la logique de modèle à intensité et d’équilibrage des jambes. Les quatre PDF et les photos de la mission initiale ont été accessibles. Le document collectif retrouvé dans Drive reproduit les consignes et retranscrit un payoff proposé par le professeur.
 
 ## 02 · Matrice des exigences et des divergences
 

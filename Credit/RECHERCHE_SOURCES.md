@@ -1,8 +1,30 @@
-# Calibration sur données publiques réelles
+# Sources publiques et couverture CDS
 
 **Revalidation finale.** Les huit réponses officielles ciblées repassent à l’identique sous SHA-256. Les 21 observations historiques ont été recoupées sur les archives déjà détenues. La convention de conversion du champ Tradeweb reste indéterminée. Voir l’[audit Option B](AUDIT_SPREAD_TRADEWEB.md) et les [preuves de rapprochement](outputs/audit_final/source_hash_revalidation.json).
 
 Recherche et accès vérifiés le 18 novembre 2026. La période de recherche couvre les jours ouvrés du 6 mai au 17 novembre 2026. Le 6 novembre est la date de clôture de l’étude ECE initiale. Les liens de téléchargement et empreintes SHA-256 des réponses retenues figurent dans les fichiers de données. Les mentions A à D évaluent l’utilité pour ce projet, de directement exploitable sous conventions explicites à insuffisant pour la calibration.
+
+## Recherche ING5 · Registre et couverture au 26 novembre 2026
+
+| Source primaire | Champ vérifié | Décision |
+|---|---|---|
+| [FSB, liste 2025](https://www.fsb.org/uploads/P271125.pdf) | Publication le 27 novembre 2025, Société Générale groupe 1, BNP Paribas groupe 2 | Statut G-SIB connu avant le 20 mai 2026 |
+| [Banca d’Italia](https://www.bancaditalia.it/compiti/stabilita-finanziaria/politica-macroprudenziale/2025.11.14-o-sii/index.html?com.dotmarketing.htmlpage.language=1) | UniCredit S.p.A. groupe O-SII en Italie, avis du 14 novembre 2025 | Couvre le groupe italien retenu |
+| [BaFin via CERS](https://www.esrb.europa.eu/pub/pdf/other/Esrb.notification251201_OSII_DE~ca0a4bcc17.en.pdf) | Commerzbank AG, avis du 1er décembre 2025, entrée en vigueur le 1er janvier 2026 | Couvre l’entité consolidée allemande |
+| [BCE, périmètre supervisé](https://www.bankingsupervision.europa.eu/ecb/pub/pdf/ssm.listofsupervisedentities202512.en.pdf) | Contrôle des entités, liste publiée en décembre 2025 | La supervision significative et la désignation G-SIB/O-SII ont des critères distincts |
+| [EBA, compilation O-SII](https://www.eba.europa.eu/publications-and-media/press-releases/eba-updates-list-other-systemically-important-institutions-2) | Publication agrégée du 2 juin 2026 | Contrôle documentaire postérieur. Les désignations nationales déterminent l’éligibilité de mai. |
+| [BoursoBank](https://www.boursorama.com/bourse/taux/) · [fiche BNP](https://www.boursorama.com/bourse/taux/cours/3xBNP/) · [fiche Société Générale](https://www.boursorama.com/cours/cds/3xSOCGEN/page-5) | Dernier J−1, attribution Markit et aperçu cinq séances. Série téléchargeable sur six mois, rang de dette, convention par et UPI non établis. | Examen de l’affichage public. Aucun chiffre repris dans les données distribuées. Les conditions d’utilisation restreignent la collecte automatique et la redistribution. [CGU §4.3](https://www.boursorama.com/cg-brs.pdf) |
+| [Tradeweb SBSEF](https://reports.tradeweb.com/public/sbsefdownloads/) · [DTCC/SEC](https://pddata.dtcc.com/ppd/secdashboard) | XML clôture par UPI et archives de tickets. Le rapprochement contrôle date, UPI, devise, échéance et coupon. | 21 rapprochements existants et contrôlés. Six séances complètes du 18 au 25 novembre vérifiées en plus, zéro nouveau rapprochement. Les 12 reçus HTTP et empreintes sont [joints](outputs/systemic/additional_source_checks.json). |
+| [DTCC/CFTC public](https://pddata.dtcc.com/ppd/cftcdashboard) | Rapports journaliers du 6 et 17 novembre et contrôle SEC du 6 mai. Respectivement 207, 128 et 0 lignes candidates dans les champs option ou FISN. Les rapports incluent les événements de cycle de vie. | Aucun nom cible identifiable dans les champs FISN ou sous-jacent de cet échantillon. Le [relevé des options](outputs/systemic/options_search.json) décrit les filtres et horodatages de rapport. |
+| [ICE](https://www.ice.com/credit-derivatives/options) · [LCH CDSClear](https://www.lseg.com/en/post-trade/clearing/lch-services/cdsclear/essentials/pricing-data) · [S&P Global](https://www.spglobal.com/market-intelligence/en/solutions/products/credit-index-pricing-data) | Offres d’options et de prix d’indices. LCH expose notamment des références iTraxx Crossover. Les clauses ICE encadrent les prix de règlement. | Aucun historique public de prix d’options par banque avec expiries, strikes et conventions suffisants pour le recalage. [Conditions ICE](https://www.ice.com/publicdocs/Markit_ICE_Settlement_Pricing_Terms_of_Use.pdf) |
+
+Le [catalogue des sources](data/market/cds_source_audit.csv) est disponible en CSV. Le cache [DTCC seul](data/market/dtcc.csv) conserve les opérations consultées dont les caractéristiques ne permettent pas une calibration. Le [ruban public](outputs/systemic/observed_credit_history.csv) réunit les horodatages du ticket apparié et du rapport, le type de quote, les identifiants, les URL et les empreintes de récupération.
+
+Le tri élargi des XML par nom et UPI a couvert les candidats du [registre](data/market/systemic_banks_verified.csv), dont Crédit Agricole, Deutsche Bank, Santander, BPCE, ING et Intesa. Les identifiants groupe et entité CDS ont été contrôlés séparément. UniCredit Bank GmbH et UniCredit S.p.A. sont deux entités. Les quatre points entre 4,5 et 5,5 ans, dont BNP, restent de dates, rangs ou maturités différents. Le [ruban public](outputs/systemic/observed_credit_history.csv) les identifie avec le champ `tenor_near_5y`.
+
+La fenêtre du 6 mai au 6 novembre 2026 est une convention d’étude reprise du projet existant. Le support du professeur, `DerivesFinanciers_Projet_2026 (1).pdf`, p. 4, demande six mois sans fixer ces bornes. Les observations retenues s’arrêtent au 21 juillet et aucun CDS apparié n’est disponible au 6 novembre. La date du 20 mai est un snapshot alternatif choisi rétrospectivement pour sa comparabilité. La courbe et les contrats sont de la même date et les désignations utilisées étaient déjà publiques. Les archives de marché sont des reconstructions rétrospectives à partir des données publiées, sans garantie d’horodatage de disponibilité intrajournalière.
+
+L’estimation historique exigerait des CDS de même rang, maturité et convention de spread, des séances synchrones et un pas connu. Pour des variations log quotidiennes homogènes, l’écart-type peut s’annualiser par `sqrt(252)` sous hypothèse de séances comparables. Ici les UPI retenus ont cinq, cinq et quatre dates, avec une à deux dates simultanées par paire. Aucune volatilité ni corrélation n’est publiée. La dynamique risque-neutre d’un CDS individuel demanderait des primes d’options comparables, leurs dates, strikes, types, conventions d’exercice et courbes sous-jacentes. Les données d’indice ne fournissent pas ces paramètres individuels.
 
 ## Comparatif des CDS
 
@@ -64,3 +86,6 @@ Les snapshots crédit se concentrent du 6 mai au 21 juillet. Les 18 dates corres
 - [Qualité des courbes le 6 novembre](outputs/public/discount_quality.csv) · [Effet des courbes sur le scénario crédit synthétique](outputs/public/first_default_sensitivity.csv)
 - [Registre DTCC senior](data/market/dtcc.csv) · [Archives DTCC vérifiées](data/market/dtcc_archive_manifest.csv) · [Rapports Tradeweb vérifiés](data/market/tradeweb_archive_manifest.csv) · [Couverture d’audit](outputs/public/cds_coverage.csv)
 
+### Réutilisation du benchmark EIOPA
+
+Source : EIOPA – European Insurance and Occupational Pensions Authority, https://eiopa.europa.eu/. Le CSV transforme la courbe publique en facteurs d’actualisation pour cette étude. This document uses material downloaded from EIOPA’s website. EIOPA does not endorse the publication and accepts no liability for intellectual property infringements or damage to third parties arising from it. [Notice EIOPA](https://www.eiopa.europa.eu/legal-notice_en)

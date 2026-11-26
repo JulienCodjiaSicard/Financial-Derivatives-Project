@@ -1,0 +1,25 @@
+{
+  "valuation_date": "2026-05-20",
+  "requested_window": [
+    "2026-05-06",
+    "2026-11-06"
+  ],
+  "eligible_names": [
+    "UniCredit S.p.A.",
+    "Société Générale SA",
+    "Commerzbank AG"
+  ],
+  "classification_publication_cutoff": "2026-05-20",
+  "public_quote_status": "option_B_academic_equivalence",
+  "observed_quotes_in_window": 21,
+  "same_day_2026_11_06_quotes": 0,
+  "complete_selected_basket_dates": 1,
+  "near_5y_quotes_in_window": 4,
+  "volatility_status": "unidentified_no_sufficient_single_name_option_or_history",
+  "pd_threshold_status": "not_specified_in_project_documents",
+  "seed_fit": 2046,
+  "seed_systemic_factor": 2047,
+  "seed_exponential_thresholds": 2048,
+  "projection_horizon_years": 7.0,
+  "credit_only_coupon_annual_assumption": 0.07
+}

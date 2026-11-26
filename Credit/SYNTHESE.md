@@ -2,6 +2,22 @@
 
 **Synthèse pour la soutenance.** Le groupe Crédit calibre des intensités de défaut à partir de CDS EUR et fournit au groupe Pricing le premier défaut du panier et les états de survie à ses dates d’observation. Le moteur est validé sur données synthétiques et a été calibré sur des spreads de transaction publics à une maturité par banque et date.
 
+## Cas de référence ING5
+
+Un CDS échange une prime contre une protection en cas de défaut. Le spread dépend du recouvrement, de la date des flux, de leur actualisation et de la survie du nom. Nous le convertissons en intensité risque-neutre par égalité des jambes. Avec un ticket à une seule maturité par banque, une intensité constante jusqu’à ce pilier suffit à retrouver le spread. Le contrôle indépendant réintègre les flux et le coupon couru au défaut.
+
+| Banque | Désignation | Spread | Intensité annuelle | PD au pilier |
+|---|---|---:|---:|---:|
+| UniCredit | O-SII, Banca d’Italia | 51,85 pb | 0,6460 % | 1,97 % |
+| Société Générale | G-SIB, FSB | 54,60 pb | 0,6803 % | 2,08 % |
+| Commerzbank | O-SII, BaFin | 63,75 pb | 0,7943 % | 2,42 % |
+
+Ces trois observations EUR subordonnées du 20 mai 2026 partagent le 20 juin 2029 comme maturité. Les avis réglementaires sont antérieurs à cette date. Les tickets Tradeweb et DTCC sont rapprochés par date, UPI et caractéristiques du contrat. Le spread de clôture est utilisé comme équivalent par dans nos conventions. Le ticket BNP senior du 25 juin à 39,75 pb sert d’exemple proche de cinq ans, avec une survie de 96,76 % au pilier de 4,989 ans. Voir les [sources](RECHERCHE_SOURCES.md) et les [détails du repricing](AUDIT_SPREAD_TRADEWEB.md).
+
+Le premier défaut correspond à la plus petite date de défaut parmi les trois banques. Sous indépendance, la survie du panier est le produit des survies marginales. Les modèles Cox lognormal et CIR++ introduisent un facteur commun et recalent les survies. Leurs paramètres dynamiques restent hypothétiques. Les observations sont trop peu synchronisées pour estimer des volatilités et des corrélations stables, et la recherche d’options publiques n’a pas fourni une surface exploitable par banque.
+
+La PD du premier défaut vaut 6,34 % à 3,09 ans et environ 13,80 % à 7 ans sous indépendance et prolongement central. Les variantes de prolongement donnent 10,14–17,30 %. Un coupon de 7 % annuel représente 3,50 par semestre par 100 avant la condition Crédit. À 7 ans, les 86,21 % de chances de respecter cette condition donnent 3,02. En interprétation 7 % par semestre, le montant est 6,03. Un choc de +25 pb partout abaisse l’exemple annuel à 2,83. Les 14 observations et les masques booléens sont remis à Pricing. Le [guide de soutenance](GUIDE_SOUTENANCE.md) décrit les manipulations et les réponses courtes.
+
 ## 1 · Du spread CDS à l’état du panier
 
 Un CDS échange une prime contre une protection versée en cas d’événement de crédit lié à une entité juridique. Pour un nominal unitaire et un recouvrement \(R\), la protection verse \(1-R\). Le spread par égalise la valeur de la protection et celle des primes, y compris la prime courue au défaut. Le moteur calcule les deux jambes avec les facteurs EUR et un calendrier trimestriel académique.

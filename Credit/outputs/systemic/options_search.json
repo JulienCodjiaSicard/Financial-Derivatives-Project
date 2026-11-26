@@ -1,0 +1,41 @@
+{
+  "scope": "targeted sampled public daily reports; not an exhaustive history",
+  "archives": [
+    {
+      "archive": "CFTC_CUMULATIVE_CREDITS_2026_11_06.zip",
+      "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_CREDITS_2026_11_06.zip",
+      "sha256": "0d51ccc49c77db916cae00fda13f1cd46c8e73e18479459039ff21aa70e5e9d1",
+      "report_rows_including_lifecycle": 2249,
+      "option_candidate_rows": 207,
+      "option_fisn_labels": [
+        "NA/CDS Idx Swt",
+        "NA/Cr Sw Oth CDS Corp Cs"
+      ],
+      "option_rows_with_target_bank_in_fisn_or_underlier": 0,
+      "identified_candidate_rows": []
+    },
+    {
+      "archive": "CFTC_CUMULATIVE_CREDITS_2026_11_17.zip",
+      "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/cftc/CFTC_CUMULATIVE_CREDITS_2026_11_17.zip",
+      "sha256": "8d8a007dab6067bb9c9f86e79cd1c012dc22adb05f70a764e7d0f83a95bbeb0d",
+      "report_rows_including_lifecycle": 2225,
+      "option_candidate_rows": 128,
+      "option_fisn_labels": [
+        "NA/CDS Idx Swt",
+        "NA/Cr Op Swps EuPt Van Ph"
+      ],
+      "option_rows_with_target_bank_in_fisn_or_underlier": 0,
+      "identified_candidate_rows": []
+    },
+    {
+      "archive": "SEC_CUMULATIVE_CREDITS_2026_05_06.zip",
+      "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/sec/SEC_CUMULATIVE_CREDITS_2026_05_06.zip",
+      "sha256": "b03f9badfc18910182a504c4571f9e5006427cbc96c37d43d56ee2b667847c44",
+      "report_rows_including_lifecycle": 1180,
+      "option_candidate_rows": 0,
+      "option_fisn_labels": [],
+      "option_rows_with_target_bank_in_fisn_or_underlier": 0,
+      "identified_candidate_rows": []
+    }
+  ]
+}

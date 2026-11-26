@@ -2167,6 +2167,335 @@ def run_transaction_study(folder: Path) -> None:
 
 
 
+SYSTEMIC_SNAPSHOT_DATE = "2026-05-20"
+SYSTEMIC_BANKS_FILE = "market/systemic_banks_verified.csv"
+
+
+def systemic_snapshot(*, root: Path = BASE / "data") -> tuple[pd.DataFrame, DiscountCurve, pd.DataFrame]:
+    """Load the eligible same-day, same-tier systemic-basket evidence."""
+    registry = pd.read_csv(root / SYSTEMIC_BANKS_FILE, dtype=str, keep_default_na=False)
+    _require(registry, {"bank_name", "systemic_status", "known_from", "classification_url",
+                        "upi", "decision", "seniority", "currency"})
+    chosen = registry[registry["decision"].eq("selected")]
+    day = _date(SYSTEMIC_SNAPSHOT_DATE)
+    if (not 1 <= len(chosen) <= 5 or not chosen["upi"].is_unique or not chosen["bank_name"].is_unique
+            or not _days(chosen["known_from"]).le(day).all()
+            or not chosen["systemic_status"].isin(["G-SIB", "O-SII", "G-SIB + O-SII"]).all()
+            or not chosen["classification_url"].str.startswith("https://").all()
+            or not chosen["currency"].eq("EUR").all()
+            or chosen["seniority"].nunique() != 1):
+        raise ValueError("The systemic basket requires contemporaneous official classifications and one EUR debt tier.")
+    q = transaction_credit_data(root=root)
+    q = q[q["valuation_date"].eq(day) & q["entity_id"].isin(chosen["upi"])]
+    identity = q.merge(chosen, left_on="entity_id", right_on="upi", suffixes=("", "_registry"))
+    if (len(identity) != len(chosen) or not identity["bank_name"].eq(identity["bank_name_registry"]).all()
+            or not identity["seniority"].eq(identity["seniority_registry"]).all()):
+        raise ValueError("The approved systemic basket does not match the same-day CDS records.")
+    _, curves = public_discount_data("dtcc_ois", root=root)
+    if day not in curves:
+        raise ValueError("The same-date €STR OIS reconstruction is missing.")
+    return q, curves[day], registry
+
+
+def independent_cds_repricing(cal: Calibration) -> pd.DataFrame:
+    """Quadrature of both unit-notional CDS legs in the engine's running conventions."""
+    from scipy.integrate import quad
+
+    out = []
+    for row in cal.repricing.itertuples():
+        hazard, df = cal.curves[row.entity_id], cal.discount
+        dates = np.r_[0., _schedule(row.tenor_years, .25)]
+
+        def intensity_pv(t: float) -> float:
+            return float(df(t) * hazard.default_density(t))
+
+        scheduled = float(np.diff(dates) @ (df(dates[1:]) * hazard.survival_probability(dates[1:])))
+        default_pv = accrued = 0.
+        for lo, hi in zip(dates[:-1], dates[1:]):
+            knots = np.r_[df.times, hazard.edges]
+            points = np.unique(knots[(lo < knots) & (knots < hi)])
+            default_pv += quad(intensity_pv, lo, hi, points=points, epsabs=1e-12)[0]
+            accrued += quad(lambda t: (t-lo)*intensity_pv(t), lo, hi, points=points, epsabs=1e-12)[0]
+        annuity = scheduled+accrued
+        premium = row.spread_bps*BP*annuity
+        protection = (1-row.recovery)*default_pv
+        model_bps = protection/annuity/BP
+        tolerance = FIT_TOL_BPS if row.fit == "exact" else np.nan
+        out.append({"valuation_date": row.valuation_date, "entity_id": row.entity_id, "bank_name": row.bank_name,
+                    "seniority": row.seniority, "maturity_years": row.tenor_years,
+                    "maturity_date": getattr(row, "maturity_date", None), "calibration_status": row.fit,
+                    "input_spread_bps": row.spread_bps, "model_spread_bps": model_bps,
+                    "residual_bps": model_bps-row.spread_bps, "tolerance_bps": tolerance,
+                    "within_tolerance": abs(model_bps-row.spread_bps) < tolerance,
+                    "protection_leg_pv": protection, "premium_leg_pv_at_input_spread": premium,
+                    "protection_minus_premium_pv": protection-premium, "accrued_on_default_annuity": accrued,
+                    "coupon_contractual_bps": getattr(row, "coupon_bps", np.nan),
+                    "upfront_unsigned_eur_provenance": getattr(row, "dtcc_upfront_amount_unsigned", np.nan),
+                    "upfront_signed_verified": False, "quote_quality": getattr(row, "quote_quality", row.data_kind),
+                    "hazard_annual": row.hazard_annual, "recovery": row.recovery,
+                    "survival_at_maturity": row.survival, "pd_at_maturity": row.cumulative_pd})
+    return pd.DataFrame(out)
+
+
+def extend_credit_curves(curves: Mapping[str, HazardCurve], horizon: float, *,
+                         tail_multiplier: float | None) -> dict[str, HazardCurve]:
+    """Use an explicit constant-hazard segment beyond each last fitted node."""
+    if not curves or not np.isfinite(horizon) or horizon <= 0:
+        raise ValueError("Supply a nonempty basket and a finite positive horizon.")
+    if tail_multiplier is not None and (not np.isfinite(tail_multiplier) or tail_multiplier < 0):
+        raise ValueError("The terminal hazard multiplier must be finite and nonnegative.")
+    result = {}
+    for name, curve in curves.items():
+        if horizon <= curve.edges[-1] + 1e-12:
+            result[name] = curve
+        elif tail_multiplier is None:
+            raise ValueError("Select an explicit terminal hazard scenario beyond the last fitted maturity.")
+        else:
+            result[name] = HazardCurve(np.r_[curve.edges, horizon],
+                                       np.r_[curve.lambdas, tail_multiplier*curve.lambdas[-1]])
+    return result
+
+
+def coupon_survival_masks(credit: CreditScenarios, times: ArrayLike = COUPON_TIMES
+                          ) -> tuple[NDArray[np.bool_], NDArray[np.bool_]]:
+    """Return individual (path, bank, date) and basket (path, date) states for Pricing."""
+    times = _times(times, credit.grid[-1], "Coupon observation dates must fit the credit simulation")
+    if times.ndim != 1 or not len(times) or np.any(np.diff(times) <= 0):
+        raise ValueError("Coupon observation times must be strictly increasing.")
+    individual = credit.default_times[:, :, None] > times
+    return individual, individual.all(axis=1)
+
+
+@dataclass(frozen=True)
+class CreditCoupon:
+    """Risk-neutral credit-only coupon analytics, stratified by bank and observation."""
+    banks: pd.DataFrame
+    basket: pd.DataFrame
+
+
+def credit_coupon(curves: Mapping[str, HazardCurve], *, discount: DiscountCurve | None = None,
+                  tail_multiplier: float | None = None, nominal: float = 100., coupon_rate: float = .07,
+                  rate_convention: str = "annual", scenarios: CreditScenarios | None = None) -> CreditCoupon:
+    """Summarize credit-only coupons and explicitly flag every extrapolated maturity."""
+    if not np.isfinite([nominal, coupon_rate]).all() or nominal <= 0 or coupon_rate < 0:
+        raise ValueError("Coupon illustration requires a positive notional and a nonnegative rate.")
+    frequency = {"annual": .5, "per_semester": 1.}
+    if rate_convention not in frequency:
+        raise ValueError("Coupon rate convention must be annual or per_semester.")
+    t = COUPON_TIMES
+    projected = extend_credit_curves(curves, float(t[-1]), tail_multiplier=tail_multiplier)
+    if scenarios is not None and scenarios.entities != tuple(curves):
+        raise ValueError("Pricing scenarios and coupon curves must use the same bank order.")
+    if scenarios is not None and scenarios.model is not None:
+        targets = np.array([c.survival_probability(scenarios.grid) for c in projected.values()])
+        if not np.allclose(targets, scenarios.model.targets, atol=1e-13, rtol=0):
+            raise ValueError("Coupon extrapolation and stochastic calibration must use the same target survival.")
+    terminal = np.array([c.edges[-1] for c in curves.values()])
+    modeled = np.array([c.integrated_hazard(np.r_[0., t]) for c in projected.values()])
+    survival = np.exp(-modeled[:, 1:])
+    extrapolated = t[None, :] > terminal[:, None] + 1e-12
+    bank_frames = []
+    for i, name in enumerate(curves):
+        bank_frames.append(pd.DataFrame({"entity_id": name, "semester": np.arange(1, len(t)+1), "time_years": t,
+            "risk_neutral_survival": survival[i], "risk_neutral_pd": -np.expm1(-modeled[i, 1:]),
+            "conditional_pd_given_alive_semester": -np.expm1(-np.diff(modeled[i])),
+            "hazard_annual": projected[name].hazard_rate(t),
+            "last_fitted_years": terminal[i], "extrapolated": extrapolated[i]}))
+    independent = survival.prod(axis=0)
+    basket = pd.DataFrame({"semester": np.arange(1, len(t)+1), "time_years": t,
+        "independent_survival": independent, "independent_first_default_pd": -np.expm1(-modeled[:, 1:].sum(axis=0)),
+        "extrapolated": extrapolated.any(axis=0), "terminal_hazard_multiplier": tail_multiplier,
+        "nominal": nominal, "coupon_rate": coupon_rate, "rate_convention": rate_convention})
+    if scenarios is None:
+        condition = independent
+        basket["dependence"] = "independent_analytical"
+    else:
+        individual, alive = coupon_survival_masks(scenarios, t)
+        condition = alive.mean(axis=0)
+        basket["dependence"] = scenarios.model.kind if scenarios.model is not None else "independent_mc"
+        basket["mc_standard_error"] = np.sqrt(condition*(1-condition)/len(alive))
+        for i, bank in enumerate(bank_frames):
+            bank["mc_survival"] = individual[:, i].mean(axis=0)
+    basket["credit_condition_probability"] = condition
+    basket["first_default_pd"] = 1-condition
+    basket["expected_credit_only_coupon"] = nominal*coupon_rate*frequency[rate_convention]*condition
+    if discount is not None and discount.times[-1] >= t[-1]-1e-12:
+        basket["deterministic_discount_factor"] = discount(t)
+        basket["discounted_credit_only_coupon"] = basket["expected_credit_only_coupon"]*discount(t)
+    return CreditCoupon(pd.concat(bank_frames, ignore_index=True), basket)
+
+
+def credit_path_intensities(curves: Mapping[str, HazardCurve], credit: CreditScenarios
+                           ) -> tuple[FloatArray, FloatArray]:
+    """Materialize pathwise interval intensities and integrated hazards on the common grid."""
+    if tuple(curves) != credit.entities:
+        raise ValueError("Credit paths and hazard curves must use the same bank order.")
+    dt = np.diff(credit.grid)
+    paths, banks = credit.default_times.shape
+    intensity = np.empty((paths, banks, dt.size))
+    if credit.model is None:
+        for k, curve in enumerate(curves.values()):
+            intensity[:, k, :] = np.diff(curve.integrated_hazard(credit.grid))/dt
+    else:
+        if credit.factor is None:
+            raise ValueError("Stochastic credit paths require the simulated factor.")
+        target = np.array([curve.survival_probability(credit.grid) for curve in curves.values()])
+        if not np.allclose(target, credit.model.targets, atol=1e-13, rtol=0):
+            raise ValueError("Intensity grids require the same survival targets as the model fit.")
+        for k in range(banks):
+            for j in range(dt.size):
+                intensity[:, k, j] = credit.model._intensity(credit.factor[:, j], j, k)
+    integrated = np.concatenate([np.zeros((paths, banks, 1)),
+                                 np.cumsum(intensity*dt, axis=2)], axis=2)
+    return intensity, integrated
+
+
+
+def run_systemic_study(folder: Path) -> None:
+    """Reproduce the systemic-basket, credit coupon and stochastic scenario deliverables offline."""
+    import json
+    from time import perf_counter
+
+    folder.mkdir(parents=True, exist_ok=True)
+    q, discount, _ = systemic_snapshot()
+    cal = calibrate_credit(q, discount)
+    day = discount.valuation_date
+    names = q.set_index("entity_id")["bank_name"].to_dict()
+    quotes = transaction_credit_data()
+    bnp = quotes[quotes["valuation_date"].eq(pd.Timestamp("2026-06-25"))
+                 & quotes["entity_id"].eq("QZ1ZPP7V49J6")]
+    bnp_discount = public_discount_data("dtcc_ois")[1][pd.Timestamp("2026-06-25")]
+    bnp_cal = calibrate_credit(bnp, bnp_discount)
+    for label, market_cal in (("systemic_basket", cal), ("bnp_senior_alternative", bnp_cal)):
+        table = independent_cds_repricing(market_cal)
+        probs = credit_coupon(market_cal.curves, tail_multiplier=1.).banks
+        horizon_pd = probs.pivot(index="entity_id", columns="time_years", values="risk_neutral_pd")
+        for t in (1., 2., 3., 4., 5., 7.):
+            table[f"pd_{int(t)}y"] = table["entity_id"].map(horizon_pd[t])
+        table["pd_5y_extrapolated"] = table["maturity_years"].lt(5.)
+        table["pd_7y_extrapolated"] = table["maturity_years"].lt(7.)
+        table["terminal_hazard_multiplier"] = 1.
+        table.assign(study=label).to_csv(folder / f"{label}_repricing.csv", index=False)
+    pd.concat([
+        credit_coupon(bnp_cal.curves, tail_multiplier=m).banks.assign(bank_name="BNP Paribas SA",
+            valuation_date=bnp_discount.valuation_date, terminal_hazard_multiplier=m)
+        for m in (.5, 1., 1.5)
+    ], ignore_index=True).to_csv(folder / "bnp_senior_semesters.csv", index=False)
+
+    stress_banks, stress_coupon = [], []
+    stressed_cases = [(f"parallel_{b:+d}bp", b, None, None, None) for b in (-50, -25, -10, 1, 10, 25, 50, 100)]
+    stressed_cases.extend((f"recovery_{int(r*100)}pct", 0, r, None, None) for r in (.10, .20, .30, .40, .50))
+    target = q[q["entity_id"].eq("QZBWPV8THS72")].iloc[0]
+    stressed_cases.append(("socgen_only_observed_maturity_+25bp", 25, None, target.entity_id, target.tenor_years))
+    coupon_cases = [(f"tail_{m:g}x", cal, m) for m in (.5, 1., 1.5)]
+    coupon_cases.extend((label, credit_stress(q, discount, spread_bump_bps=bump, recovery=rec,
+                                              entity=entity, tenor_years=tenor), 1.)
+                        for label, bump, rec, entity, tenor in stressed_cases)
+    for label, model_cal, multiplier in coupon_cases:
+        coupon = credit_coupon(model_cal.curves, discount=discount, tail_multiplier=multiplier)
+        stress_banks.append(coupon.banks.assign(scenario=label, bank_name=coupon.banks["entity_id"].map(names),
+            valuation_date=day, terminal_hazard_multiplier=multiplier,
+            recovery=coupon.banks["entity_id"].map(model_cal.repricing.set_index("entity_id")["recovery"])))
+        stress_coupon.append(coupon.basket.assign(scenario=label, valuation_date=day))
+    pd.concat(stress_banks, ignore_index=True).to_csv(folder / "coupon_banks.csv", index=False)
+    pd.concat(stress_coupon, ignore_index=True).to_csv(folder / "coupon_semesters.csv", index=False)
+
+    projected = extend_credit_curves(cal.curves, 7., tail_multiplier=1.)
+    fitted_maturity = min(float(c.edges[-1]) for c in cal.curves.values())
+    stochastic_specs = [
+        ("independent", None, None, .25, 12000),
+        ("lognormal_low", "lognormal", FactorParams(beta=.35), .25, 12000),
+        ("lognormal_central", "lognormal", FactorParams(), .25, 12000),
+        ("lognormal_high", "lognormal", FactorParams(beta=1.8), .25, 12000),
+        ("lognormal_higher_sigma", "lognormal", FactorParams(sigma=.65), .25, 12000),
+        ("lognormal_slower_kappa", "lognormal", FactorParams(kappa=.35), .25, 12000),
+        ("cirpp", "cirpp", FactorParams(sigma=.035), .25, 12000),
+        ("lognormal_n4000", "lognormal", FactorParams(), .25, 4000),
+        ("lognormal_step_halfyear", "lognormal", FactorParams(), .5, 12000),
+    ]
+    distribution, marginals, mc_coupons = [], [], []
+    for label, kind, parameters, step, n in stochastic_specs:
+        start = perf_counter()
+        grid = np.unique(np.r_[np.arange(0., 7.+step/2, step), fitted_maturity])
+        model = (None if kind is None else fit_stochastic(projected, grid, kind, parameters,
+                                                         n_calibration=4096, seed=2046))
+        z = None if model is None else scenario_normals(grid, n, 2047)
+        paths = simulate_credit(projected, grid, n, credit_innovations=z, model=model, seed=2048)
+        times = np.array([fitted_maturity, 5., 7.])
+        individual, alive = coupon_survival_masks(paths, times)
+        counts = (~individual).sum(axis=1)
+        elapsed = perf_counter()-start
+        for j, t in enumerate(times):
+            probs = np.bincount(counts[:, j], minlength=len(names)+1)/n
+            first_pd = 1-alive[:, j].mean()
+            distribution.append({"scenario": label, "time_years": t, "extrapolated": t>fitted_maturity,
+                "paths": n, "max_step_years": step, "first_default_pd": first_pd,
+                "mc_se": np.sqrt(first_pd*(1-first_pd)/n), "independent_analytic_pd":
+                float(1-basket_survival(projected, t)), "runtime_seconds": elapsed,
+                "kappa": parameters.kappa if parameters else np.nan, "sigma": parameters.sigma if parameters else np.nan,
+                "beta": parameters.beta if parameters else np.nan, "min_intensity": paths.min_intensity,
+                "max_intensity": paths.max_intensity, "stochastic_parameter_status": "scenario_not_option_calibrated",
+                **{f"prob_{k}_defaults": p for k, p in enumerate(probs)}})
+            for k, entity in enumerate(paths.entities):
+                population = float(projected[entity].survival_probability(t))
+                mc = individual[:, k, j].mean()
+                marginals.append({"scenario": label, "entity_id": entity, "time_years": t,
+                    "model_survival": population, "simulated_survival": mc,
+                    "empirical_se": np.sqrt(mc*(1-mc)/n), "difference": mc-population,
+                    "conditional_mean_survival": paths.conditional_mean_survival[k, np.searchsorted(grid, t)],
+                    "conditioned_se": paths.conditional_survival_se[k, np.searchsorted(grid, t)]})
+        report = credit_coupon(cal.curves, discount=discount, tail_multiplier=1., scenarios=paths)
+        mc_coupons.append(report.basket.assign(scenario=label, valuation_date=day))
+        if label == "lognormal_central":
+            masks, mask = coupon_survival_masks(paths)
+            intensity, integrated = credit_path_intensities(projected, paths)
+            np.savez_compressed(folder / "pricing_credit_paths.npz", entities=np.asarray(paths.entities),
+                valuation_date=np.asarray(str(day.date())), grid_years=paths.grid, coupon_years=COUPON_TIMES,
+                default_times=paths.default_times, first_default_times=paths.first_default_times,
+                individual_coupon_alive=masks, basket_coupon_alive=mask, default_count=(~masks).sum(axis=1),
+                factor=paths.factor, interval_intensity=intensity, integrated_hazard=integrated,
+                assumed_tail_multiplier=np.asarray(1.))
+    pd.DataFrame(distribution).to_csv(folder / "dependence_and_convergence.csv", index=False)
+    pd.DataFrame(marginals).to_csv(folder / "mc_marginals.csv", index=False)
+    pd.concat(mc_coupons, ignore_index=True).to_csv(folder / "coupon_dependence.csv", index=False)
+
+    start, end = (_date(d) for d in WINDOW)
+    historical = quotes[quotes["valuation_date"].between(start, end)]
+    history_columns = ["valuation_date", "dtcc_execution_at", "generated_at", "entity_id", "bank_name",
+                       "reference_entity_id", "currency", "seniority", "maturity_date", "tenor_years",
+                       "spread_bps", "coupon_bps", "source_quote_type", "quote_quality", "market_par_verified",
+                       "provider", "collected_at", "source_url", "response_sha256", "dtcc_source_url",
+                       "dtcc_response_sha256", "dtcc_dissemination_id"]
+    hist = historical[history_columns].copy()
+    hist["tenor_near_5y"] = hist["tenor_years"].between(4.5, 5.5)
+    hist["sampling"] = "discontinuous_transactions"
+    hist.to_csv(folder / "observed_credit_history.csv", index=False)
+    rows = []
+    for (entity, bank), series in hist.groupby(["entity_id", "bank_name"]):
+        rows.append({"entity_id": entity, "bank_name": bank, "distinct_dates": series["valuation_date"].nunique(),
+                     "first": series["valuation_date"].min(), "last": series["valuation_date"].max(),
+                     "matched_target_basket": entity in names, "near_5y_observations": int(series["tenor_near_5y"].sum()),
+                     "annualized_volatility": np.nan, "status": "insufficient_homogeneous_history"})
+    pd.DataFrame(rows).to_csv(folder / "history_coverage.csv", index=False)
+    aligned = hist[hist["entity_id"].isin(names)].pivot_table(
+        index="valuation_date", columns="entity_id", values="spread_bps", aggfunc="count")
+    aligned_counts = aligned.notna().astype(int)
+    (aligned_counts.T @ aligned_counts).to_csv(folder / "history_pair_overlap.csv")
+    target_day = pd.Timestamp(WINDOW[1])
+    summary = {"valuation_date": str(day.date()), "requested_window": list(WINDOW),
+               "eligible_names": list(names.values()), "classification_publication_cutoff": str(day.date()),
+               "public_quote_status": "option_B_academic_equivalence", "observed_quotes_in_window": len(hist),
+               "same_day_2026_11_06_quotes": int(hist["valuation_date"].eq(target_day).sum()),
+               "complete_selected_basket_dates": int(aligned.notna().all(axis=1).sum()),
+               "near_5y_quotes_in_window": int(hist["tenor_near_5y"].sum()),
+               "volatility_status": "unidentified_no_sufficient_single_name_option_or_history",
+               "pd_threshold_status": "not_specified_in_project_documents", "seed_fit": 2046,
+               "seed_systemic_factor": 2047, "seed_exponential_thresholds": 2048,
+               "projection_horizon_years": 7., "credit_only_coupon_annual_assumption": .07}
+    (folder / "systemic_study.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False)+"\n", encoding="utf-8")
+
+
+
 def _run_snapshot(args: argparse.Namespace) -> None:
     import json
 
@@ -2221,6 +2550,7 @@ if __name__ == "__main__":
     parser.add_argument("--backtest-end", help="Last historical date, inclusive.")
     parser.add_argument("--require-point-in-time", action="store_true", help="Require release timestamp evidence.")
     public = parser.add_mutually_exclusive_group()
+    public.add_argument("--systemic-study", action="store_true", help="Systemic basket, Monte Carlo and coupon outputs.")
     public.add_argument("--transaction-study", action="store_true", help="Calibrate cross-verified public CDS prints.")
     public.add_argument("--public-study", action="store_true", help="Same-date public-rate sensitivity on demo CDS.")
     public.add_argument("--refresh-public", choices=[*PUBLIC_SOURCES, "dtcc_ois", "dtcc_cds", "tradeweb_cds"],
@@ -2228,13 +2558,21 @@ if __name__ == "__main__":
     parser.add_argument("--start", help="First BCE reference date.")
     parser.add_argument("--end", help="Last BCE reference date.")
     options = parser.parse_args()
-    if options.public_study or options.transaction_study or options.refresh_public:
+    if options.systemic_study or options.public_study or options.transaction_study or options.refresh_public:
         if (options.quotes or options.discount or options.bank or options.extrapolate or options.quick
                 or options.backtest_start or options.backtest_end or options.require_point_in_time
                 or options.method != "strict"):
             parser.error("Public commands use only the date, the ECB request window and the study output.")
         try:
-            if options.transaction_study:
+            if options.systemic_study:
+                if options.date or options.start or options.end:
+                    parser.error("The systemic study uses its documented same-day approved snapshot.")
+                target = options.output or BASE / "outputs/systemic"
+                if target.resolve() in {(BASE / "outputs").resolve(), (BASE / "outputs/public").resolve()}:
+                    parser.error("Use a separate directory for the systemic study.")
+                run_systemic_study(target)
+                print(f"Systemic study written to {target}")
+            elif options.transaction_study:
                 if options.date or options.start or options.end:
                     parser.error("The transaction study spans all verified cached dates.")
                 target = options.output or BASE / "outputs/public"

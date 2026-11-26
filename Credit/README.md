@@ -4,7 +4,33 @@ Le module calibre une courbe d’intensité sur les CDS EUR de chaque banque et 
 
 **Validation finale — STATUT 2.** « CREDIT FINALIZED WITH MODEL CONVENTION LIMITATIONS ». Le code, les jeux de données et les calculs autonomes sont vérifiés. Le spread Tradeweb utilise l’option B, comme équivalent par académique. Voir l’[audit du spread](AUDIT_SPREAD_TRADEWEB.md), le [rapport de validation](AUDIT.md) et la [notice d’intégration](INTEGRATION_PRICING.md) avec son exemple Python testé.
 
-## Lancer le projet
+## Version ING5 · Panier systémique et coupon
+
+Le panier de référence réunit UniCredit S.p.A., Société Générale SA et Commerzbank AG. Les trois CDS EUR subordonnés ont été traités le 20 mai 2026 et échoient le 20 juin 2029. BNP Paribas senior reste une étude séparée, au 25 juin 2026 à 4,989 ans. La [liste officielle et les décisions par banque](data/market/systemic_banks_verified.csv) documentent les entités, les catégories et les sources.
+
+Depuis le dossier contenant ce README, sous Windows avec Python 3.12.
+
+~~~powershell
+py -3.12 -m venv .venv312
+.\.venv312\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv312\Scripts\python.exe -m pytest -q -rs
+.\.venv312\Scripts\python.exe credit_engine.py --systemic-study
+.\.venv312\Scripts\python.exe -m streamlit run app.py
+~~~
+
+Si l’environnement du projet est déjà installé, les deux premières lignes sont facultatives. Une fois les dépendances installées, les tests, les études et le dashboard tournent hors ligne. Dans le dashboard, choisir **PUBLIC → Transactions CDS observées → 2026-05-20 → €STR OIS · DTCC/CFTC → Subordonné**. Les quatre onglets couvrent le CDS, le panier, le risque et les 14 observations du coupon. **DEMO** utilise des données synthétiques, **SNAPSHOT** charge vos fichiers datés et **MARKET** signale l’absence de flux connecté.
+
+| Résultat | Fichier |
+|---|---|
+| Repricing indépendant des deux jambes et PD individuelles | [Panier](outputs/systemic/systemic_basket_repricing.csv) · [BNP senior](outputs/systemic/bnp_senior_alternative_repricing.csv) |
+| PD, survies et coupons aux 14 dates avec stresses | [Panier](outputs/systemic/coupon_semesters.csv) · [Banques](outputs/systemic/coupon_banks.csv) |
+| Peuplement des défauts, erreur Monte Carlo et convergence | [Scénarios et convergence](outputs/systemic/dependence_and_convergence.csv) · [Marginales](outputs/systemic/mc_marginals.csv) |
+| Observations réelles et couverture par banque | [Historique](outputs/systemic/observed_credit_history.csv) · [Couverture](outputs/systemic/history_coverage.csv) · [Dates communes](outputs/systemic/history_pair_overlap.csv) |
+| Masques et trajectoires prêts à lire | [Export NumPy](outputs/systemic/pricing_credit_paths.npz) · [Schéma Pricing](INTEGRATION_PRICING.md) |
+
+Consulter le [guide de soutenance](GUIDE_SOUTENANCE.md) et la [recherche de sources](RECHERCHE_SOURCES.md). La suite du README détaille les commandes existantes, le schéma d’import et les conventions techniques.
+
+## Commandes historiques et reproduction des preuves
 
 Depuis le dossier contenant ce README, avec Python 3.12 sous Windows, macOS ou Linux.
 
@@ -25,7 +51,7 @@ Le rapport de démonstration s’écrit dans outputs/. Ajouter --quick pour reca
 | Élément | Rôle |
 |---|---|
 | credit_engine.py | Import, pricer CDS, bootstrap, survie, panier, scénarios, risques, backtest et commande de démonstration |
-| app.py | Trois onglets Streamlit reliés au moteur |
+| app.py | Quatre onglets Streamlit reliés au moteur |
 | test_credit.py | Contrôles analytiques, données, modèles stochastiques, intégration et application |
 | data/ | Historique synthétique, gabarits d’import et exemples d’entités candidates |
 | outputs/ | CSV de validation, diagnostics, benchmarks et graphiques de démonstration |

@@ -84,3 +84,31 @@ print("Banques UPI", result.entities, "| Masque coupons", coupon_alive.shape)
 | Pricing | Grille, ordre des banques, chemins, règles du payoff, coupon/rappel, conventions aux dates simultanées et panier contractuel. Vérifier formes, premier défaut, réutilisation des chemins, impacts des stress sur le prix de la note et compatibilité avec Longstaff–Schwartz. |
 | Crédit | Vérifier clauses de défaut, exactitude des noms et contrats et devise/rang avant une calibration contractuelle. Transmettre intensités, survies, temps de défaut et avertissements d’extrapolation. |
 
+## Ajout ING5 · Trajectoires et observations semestrielles
+
+Le [fichier NumPy](outputs/systemic/pricing_credit_paths.npz) contient 12 000 trajectoires Crédit autonomes sous un scénario lognormal pour le panier du 20 mai 2026. Les intensités terminales sont maintenues au-delà de 3,0877 ans. Cet exemple permet de valider le raccordement et les conventions d’état du coupon. Pour une simulation jointe, repartir de la calibration, appliquer le prolongement approuvé à l’horizon commun et appeler l’API avec les innovations corrélées déjà construites par Pricing.
+
+| Champ NPZ | Forme | Unité ou convention |
+|---|---|---|
+| `entities` | (3,) | UPI en ordre de simulation. Les libellés sont dans le [registre](data/market/systemic_banks_verified.csv). |
+| `valuation_date` | scalaire | Date ISO. |
+| `grid_years`, `coupon_years` | (30,), (14,) | Grille avec 0, pas trimestriel et pilier exact de 3,0877 ans, et observations de 0,5 à 7 ans. |
+| `default_times`, `first_default_times` | (12000,3), (12000,) | Années. Infini représente un défaut censuré au-delà de la grille. |
+| `individual_coupon_alive`, `basket_coupon_alive` | (12000,3,14), (12000,14) | Booléens de survie à l’observation. À égalité avec la date, le défaut a déjà eu lieu. |
+| `default_count` | (12000,14) | Nombre de banques en défaut cumulé. |
+| `factor` | (12000,30) | Facteur OU du modèle lognormal. |
+| `interval_intensity`, `integrated_hazard` | (12000,3,29), (12000,3,30) | Intensité annuelle sur chaque intervalle et intensité intégrée à chaque nœud, depuis zéro. |
+| `assumed_tail_multiplier` | scalaire | Hypothèse de queue, 1× dans l’export. |
+
+~~~python
+import numpy as np
+
+with np.load("outputs/systemic/pricing_credit_paths.npz", allow_pickle=False) as credit:
+    times = credit["coupon_years"]
+    alive = credit["basket_coupon_alive"]
+    assert np.array_equal(alive, credit["first_default_times"][:, None] > times)
+    assert np.array_equal(alive, credit["individual_coupon_alive"].all(axis=1))
+    credit_only_cashflow = 100 * .07 * .5 * alive
+~~~
+
+`coupon_survival_masks(result, times)` est directement applicable aux simulations jointes. `extend_credit_curves(calibration.curves, horizon, tail_multiplier=...)` formalise l’hypothèse de queue. La fonction refuse un prolongement non spécifié lorsqu’il est nécessaire. `credit_path_intensities(projected_curves, result)` restitue intensités et intégrales sur la grille. `credit_coupon(...)` donne les probabilités et le benchmark des seuls coupons sous Crédit par banque et panier. Le groupe Pricing combine le masque avec ses propres conditions contractuelles, facteurs d’actualisation et dates. Le [fichier des scénarios](outputs/systemic/coupon_semesters.csv) indique le statut extrapolé de chaque échéance.

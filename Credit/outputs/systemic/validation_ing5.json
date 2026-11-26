@@ -1,0 +1,219 @@
+{
+  "validation_date_europe_paris": "2026-11-26",
+  "python": "3.12.10",
+  "baseline": {
+    "archive": "ECE_2026_Module_Credit_Validation_Finale.zip",
+    "tests_passed": 60,
+    "seconds": 68.4
+  },
+  "delivery": {
+    "tests_passed": 63,
+    "seconds": 73.94,
+    "failed": 0
+  },
+  "prior_archives_sha256": {
+    "ECE_2026_Module_Credit_Donnees_Publiques.zip": "5ca4e390dfd0e47ba6035e3023cc70dd2d57640dee0ce457da8647228c7c830b",
+    "ECE_2026_Module_Credit_Final.zip": "30f1e647fba14340f467f5321b7e31f5d08db0ece961faf6b960b787f68489ca",
+    "ECE_2026_Module_Credit_Validation_Finale.zip": "6e198274c1aa475f593827688d97af5f79fe2b7d438104d75f1b008c7c5e720e",
+    "ECE_2026_Module_Credit.zip": "f698ac4b508b1f73dbd62444382dc5da6cf9c512d04945b435b8b16462363427"
+  },
+  "existing_input_csv_preserved": 17,
+  "exact_csv_replays_excluding_timing": {
+    "demo": [
+      {
+        "file": "backtest_bank.csv",
+        "rows": 84,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "backtest_daily.csv",
+        "rows": 28,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "backtest_holdout.csv",
+        "rows": 168,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "backtest_repricing.csv",
+        "rows": 420,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "backtest_status.csv",
+        "rows": 28,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "basket.csv",
+        "rows": 255,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "dependence_stress.csv",
+        "rows": 7,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "grid_convergence.csv",
+        "rows": 6,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "invariants.csv",
+        "rows": 3,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "joint_cds.csv",
+        "rows": 32,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "performance_and_models.csv",
+        "rows": 9,
+        "ignored_timing_columns": [
+          "fit_seconds",
+          "simulation_seconds"
+        ]
+      },
+      {
+        "file": "probabilities_semiannual.csv",
+        "rows": 45,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "repricing.csv",
+        "rows": 15,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "stochastic_marginals.csv",
+        "rows": 765,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "stress_banks.csv",
+        "rows": 150,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "stress_basket.csv",
+        "rows": 10,
+        "ignored_timing_columns": []
+      }
+    ],
+    "transactions": [
+      {
+        "file": "transaction_first_default.csv",
+        "rows": 1064,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "transaction_repricing_sensitivity.csv",
+        "rows": 184,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "transaction_snapshots.csv",
+        "rows": 21,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "transaction_survival.csv",
+        "rows": 302,
+        "ignored_timing_columns": []
+      }
+    ],
+    "public_rates": [
+      {
+        "file": "cds_coverage.csv",
+        "rows": 404,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "cds_near_5y_audit.csv",
+        "rows": 376,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "credit_sensitivity.csv",
+        "rows": 240,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "discount_quality.csv",
+        "rows": 15,
+        "ignored_timing_columns": []
+      },
+      {
+        "file": "first_default_sensitivity.csv",
+        "rows": 32,
+        "ignored_timing_columns": []
+      }
+    ]
+  },
+  "browser_verification": "Streamlit agent API and Edge",
+  "pricing_archive_shapes": {
+    "entities": [
+      3
+    ],
+    "valuation_date": [],
+    "grid_years": [
+      30
+    ],
+    "coupon_years": [
+      14
+    ],
+    "default_times": [
+      12000,
+      3
+    ],
+    "first_default_times": [
+      12000
+    ],
+    "individual_coupon_alive": [
+      12000,
+      3,
+      14
+    ],
+    "basket_coupon_alive": [
+      12000,
+      14
+    ],
+    "default_count": [
+      12000,
+      14
+    ],
+    "factor": [
+      12000,
+      30
+    ],
+    "interval_intensity": [
+      12000,
+      3,
+      29
+    ],
+    "integrated_hazard": [
+      12000,
+      3,
+      30
+    ],
+    "assumed_tail_multiplier": []
+  },
+  "option_b_max_abs_cds_repricing_error_bps": 2.842170943040401e-14,
+  "max_individual_mc_survival_error": 0.004702485898638087,
+  "max_individual_mc_survival_error_empirical_se": 2.3882534386241066,
+  "coupon_terminal_annual_7_percent": {
+    "survival": 0.8620504966886515,
+    "expected_credit_only_coupon_per_100": 3.0171767384102806
+  },
+  "extracted_zip_validation": {
+    "tests_passed": 63,
+    "seconds": 66.71,
+    "failed": 0,
+    "reproduced_systemic_outputs": 13,
+    "excepted_reproduction_field": "runtime_seconds"
+  }
+}

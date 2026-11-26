@@ -1,0 +1,9 @@
+entity_id,bank_name,distinct_dates,first,last,matched_target_basket,near_5y_observations,annualized_volatility,status
+QZ1ZPP7V49J6,BNP Paribas SA,1,2026-06-25,2026-06-25,False,1,,insufficient_homogeneous_history
+QZ33BCC269KW,Deutsche Bank AG,3,2026-05-15,2026-06-01,False,0,,insufficient_homogeneous_history
+QZ3PQZ8XHQCG,UniCredit S.p.A.,5,2026-05-06,2026-06-30,True,0,,insufficient_homogeneous_history
+QZBB27CTWXW3,"Banco Santander, S.A.",1,2026-07-21,2026-07-21,False,1,,insufficient_homogeneous_history
+QZBWPV8THS72,Société Générale SA,5,2026-05-08,2026-07-01,True,0,,insufficient_homogeneous_history
+QZC5PR8X53F8,Commerzbank AG,4,2026-05-08,2026-06-26,True,0,,insufficient_homogeneous_history
+QZHNZQVFGPMW,Société Générale SA,1,2026-07-20,2026-07-20,False,1,,insufficient_homogeneous_history
+QZJMLVK1QXGR,Commerzbank AG,1,2026-06-29,2026-06-29,False,1,,insufficient_homogeneous_history

@@ -1,0 +1,11 @@
+source,accessed_on,instrument_scope,source_fields,inclusion,reason,url
+Tradeweb SBSEF,2026-11-26,CDS single-name EUR,UPI/date de rapport/symbole/spread de clôture,included,Rapprochement DTCC exigé et conversion par option B,https://reports.tradeweb.com/public/sbsefdownloads/
+DTCC SEC,2026-11-26,CDS single-name EUR,Horodatage exécution/maturité/coupon/UPI/upfront,included,Upfront non signé et notionnel potentiellement plafonné,https://pddata.dtcc.com/ppd/secdashboard
+DTCC CFTC,2026-11-26,Options de crédit dans deux archives de contrôle,UPI FISN/UPI Underlier Name/Option Type/Option Premium Currency,insufficient,Aucun sous-jacent bancaire cible identifié dans le contrôle,https://pddata.dtcc.com/ppd/cftcdashboard
+BoursoBank BNP,2026-11-26,CDS bancaire affiché,Attribution Markit/Dernier J-1/historique visible cinq jours,excluded,Attributs contractuels et réutilisation insuffisamment établis,https://www.boursorama.com/bourse/taux/cours/3xBNP/
+BoursoBank Société Générale,2026-11-26,CDS bancaire affiché,Attribution Markit/Dernier J-1/historique visible cinq jours,excluded,Attributs contractuels et réutilisation insuffisamment établis,https://www.boursorama.com/cours/cds/3xSOCGEN/page-5
+BoursoBank Commerzbank,2026-11-26,CDS bancaire affiché,Attribution Markit/Dernier J-1/historique visible cinq jours,excluded,Attributs contractuels et réutilisation insuffisamment établis,https://www.boursorama.com/cours/cds/3xCMZB/
+BoursoBank Santander,2026-11-26,CDS bancaire affiché,Attribution Markit/Dernier J-1/historique visible cinq jours,excluded,Attributs contractuels et réutilisation insuffisamment établis,https://www.boursorama.com/cours/cds/3xSANTNDR/
+ICE,2026-11-26,Options CDS indice,Description des produits et conventions,excluded,Volatilité de l'indice non transférable aux références individuelles,https://www.ice.com/credit-derivatives/options
+LCH CDSClear,2026-11-26,Options iTraxx,Échéances et strikes de l'indice,excluded,Absence de données individuelles suffisantes pour une estimation,https://www.lseg.com/en/post-trade/clearing/lch-services/cdsclear/essentials/pricing-data
+S&P Global,2026-11-26,CDX et iTraxx indice,Description du jeu commercial et de la volatilité,excluded,Série individuelle exploitable indisponible publiquement,https://www.spglobal.com/market-intelligence/en/solutions/products/credit-index-pricing-data

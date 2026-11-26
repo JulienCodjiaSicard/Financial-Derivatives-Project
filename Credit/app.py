@@ -17,7 +17,8 @@ from credit_engine import (
     demo_data, fit_stochastic, load_discount_curves, load_quotes, scenario_normals,
     simulate_credit, validate_credit, PUBLIC_CURVE_LABELS, PUBLIC_STUDY_DATE, TRANSACTION_BASE_DATE,
     discount_sensitivity, public_discount_data, refresh_dtcc_cds, refresh_dtcc_ois,
-    refresh_ecb, refresh_tradeweb_cds, transaction_credit_data,
+    refresh_ecb, refresh_tradeweb_cds, transaction_credit_data, credit_coupon,
+    SYSTEMIC_SNAPSHOT_DATE, SYSTEMIC_BANKS_FILE,
 )
 
 INK = "#142D37"
@@ -417,14 +418,22 @@ def public_view() -> None:
     st.caption(f"Observation du {day.date()} · {current.provider} · Collecte {pillars.iloc[0]['collected_at']}")
     if current.source_url:
         st.markdown(f"[Source primaire de la courbe]({current.source_url})")
-    cds_tab, basket_tab, risk_tab = st.tabs(["Calibration CDS", "Premier défaut & corrélation", "Risque, stress & backtest"])
+    cds_tab, basket_tab, risk_tab, coupon_tab = st.tabs(["Calibration CDS", "Premier défaut & corrélation", "Risque, stress & backtest", "Condition de crédit du coupon"])
+    official = pd.read_csv(root / SYSTEMIC_BANKS_FILE) if use_transactions else pd.DataFrame()
+    is_systemic = (use_transactions and curve_key == "dtcc_ois"
+                   and day == pd.Timestamp(SYSTEMIC_SNAPSHOT_DATE)
+                   and set(q["entity_id"]) == set(official.loc[official["decision"].eq("selected"), "upi"]))
     cases = {curve_key: current, **{name: curve for name, curve in matching.items() if name != curve_key}}
+    coupon_cal = None
     if not use_transactions and day in demo_discounts:
         cases["demo"] = demo_discounts[day]
     fits = basket = pd.DataFrame()
     if not q.empty:
         try:
-            fits, basket = discount_sensitivity(q, cases, mode="SNAPSHOT" if use_transactions else "DEMO")
+            mode = "SNAPSHOT" if use_transactions else "DEMO"
+            fits, basket = discount_sensitivity(q, cases, mode=mode)
+            if use_transactions:
+                coupon_cal = calibrate_snapshot(q, current, mode, list(q["entity_id"].unique()), "strict", False)
         except ValueError as exc:
             st.error(f"Calibration indisponible · {exc}")
     with cds_tab:
@@ -442,6 +451,16 @@ def public_view() -> None:
                 cols[1:1] = ["seniority", "maturity_date"]
                 cols += ["recovery", "cumulative_pd"]
                 st.subheader("Repricing des spreads traités")
+                st.caption("Une seule maturité observée par banque. Les intensités sont constantes jusqu’au pilier.")
+                relevant = official.loc[official["bank_name"].isin(current_fit["bank_name"]),
+                                        ["bank_name", "systemic_status", "authority", "known_from", "classification_url"]]
+                if not relevant.empty:
+                    format_table(relevant, "pub_systemic")
+                with st.expander("Équilibre des jambes du CDS"):
+                    legs = current_fit[["bank_name", "spread_bps", "risky_annuity", "protection_leg"]].copy()
+                    legs["jambe_prime"] = legs["spread_bps"]*1e-4*legs["risky_annuity"]
+                    legs["écart_protection_prime"] = legs["protection_leg"]-legs["jambe_prime"]
+                    format_table(legs, "pub_cds_legs")
                 with st.expander("Type de spread, qualité et collecte CDS"):
                     provenance = ["bank_name", "source_quote_type", "coupon_bps", "quote_quality",
                                   "model_cds_convention", "collected_at", "dtcc_notional_capped"]
@@ -468,6 +487,18 @@ def public_view() -> None:
             format_table(current_basket[["horizon_years", "time_status", "tail_multiplier",
                                          "pd_first_independent", "survival_single"]],
                          "pub_scenario", ("pd_first_independent", "survival_single"))
+        if is_systemic:
+            study = _systemic_export("dependence_and_convergence.csv")
+            if not study.empty:
+                st.subheader("Modèles stochastiques du panier retenu")
+                st.caption("Cox lognormal : facteur OU exponentié. CIR++ : facteur CIR positif et décalage "
+                           "déterministe. Les deux modèles sont recalés aux survies cibles. "
+                           "Volatilités, retour à la moyenne et dépendance sont des hypothèses de scénario.")
+                at_7 = study[study["time_years"].eq(7.)]
+                format_table(at_7[["scenario", "paths", "max_step_years", "first_default_pd", "mc_se",
+                                   "prob_0_defaults", "prob_1_defaults", "prob_2_defaults", "prob_3_defaults"]],
+                             "public_stochastic", ("first_default_pd", "mc_se", "prob_0_defaults",
+                                                   "prob_1_defaults", "prob_2_defaults", "prob_3_defaults"))
     with risk_tab:
         st.subheader("Sensibilités de taux, spread et recovery")
         if not fits.empty:
@@ -477,8 +508,22 @@ def public_view() -> None:
             format_table(fits[cols], "pub_stress", ("hazard_annual", "survival"))
         st.subheader("Historique des observations rapprochées")
         st.caption("Snapshots rétrospectifs, couverture discontinue. Les champs Tradeweb/DTCC sont reliés par date et UPI.")
+        st.info("La couverture ne permet pas d’estimer une volatilité annuelle ou une corrélation historique fiable "
+                "du panier. Les options publiques repérées portent sur des indices.")
+        if is_systemic:
+            with st.expander("Chocs de −50 à +100 pb, recouvrement et prolongement du panier retenu"):
+                shocks = _systemic_export("coupon_semesters.csv")
+                if not shocks.empty:
+                    format_table(shocks.loc[shocks["semester"].eq(14),
+                                 ["scenario", "first_default_pd", "expected_credit_only_coupon"]],
+                                 "public_coupon_stresses", ("first_default_pd",))
         cols = ["valuation_date", "bank_name", "seniority", "maturity_date", "spread_bps",
                 "source_url", "dtcc_source_url"]
+        history_display = observed.rename(columns={"bank_name": "Banque", "seniority": "Rang",
+                                                   "maturity_date": "Maturité"})
+        tape = px.scatter(history_display, x="valuation_date", y="spread_bps", color="Banque", symbol="Rang",
+                          hover_data=["Maturité"], color_discrete_sequence=COLORS)
+        chart(tape, "Date de transaction", "Spread de clôture (pb)", "pub_credit_tape")
         format_table(observed[cols].sort_values("valuation_date", ascending=False), "pub_history")
         for filename, label in (("dtcc.csv", "Autres transactions DTCC écartées du bootstrap"),
                                 ("estr.csv", "€STR overnight de référence"),
@@ -487,7 +532,78 @@ def public_view() -> None:
                 with st.expander(label):
                     format_table(pd.read_csv(root / "market" / filename, dtype={"Dissemination Identifier": str}),
                                  "pub_ref_" + filename)
+    with coupon_tab:
+        if coupon_cal is None:
+            st.info("Sélectionnez l’étude Transactions CDS observées pour voir un coupon du panier PUBLIC.")
+        else:
+            coupon_view(coupon_cal, q, "SNAPSHOT", "public_coupon")
 
+
+
+
+@st.cache_data(show_spinner=False)
+def _systemic_export(filename: str) -> pd.DataFrame:
+    path = BASE / "outputs/systemic" / filename
+    return pd.read_csv(path) if path.is_file() else pd.DataFrame()
+
+
+def coupon_view(cal: Calibration, snapshot: pd.DataFrame, mode: str, key: str) -> None:
+    st.subheader("Condition de crédit du coupon")
+    st.caption("À chaque semestre, la condition est satisfaite si toutes les banques sont encore en vie. "
+               "Les montants sont exprimés pour 100 de nominal sous la seule condition de crédit.")
+    st.dataframe(cal.repricing[["bank_name", "seniority"]].drop_duplicates(), hide_index=True,
+                 width="stretch", alt="Banques et rangs de dette du coupon")
+    is_extended = min(c.edges[-1] for c in cal.curves.values()) < 7.-1e-12
+    left, right = st.columns(2)
+    rate = left.selectbox("Convention du taux illustratif", ["7 % annuel", "7 % par semestre"], key=f"{key}_rate")
+    convention = "annual" if rate == "7 % annuel" else "per_semester"
+    multiplier = None
+    if is_extended:
+        choices = [None, .5, 1., 1.5] if mode == "SNAPSHOT" and key != "public_coupon" else [.5, 1., 1.5]
+        default = 0 if choices[0] is None else 1
+        multiplier = right.selectbox("Intensité après le dernier pilier", choices, index=default,
+                                     format_func=lambda x: "Choisir un scénario" if x is None else f"{x:g} ×",
+                                     key=f"{key}_tail")
+        if multiplier is None:
+            st.info("Choisissez un prolongement pour produire les 14 échéances à partir de cette courbe partielle.")
+            return
+        st.warning("SCÉNARIO · Les échéances au-delà des maturités couvertes utilisent le prolongement choisi.")
+    stress = st.checkbox("Comparer avec un choc de spreads de +25 pb", key=f"{key}_stress")
+    base = credit_coupon(cal.curves, discount=cal.discount, tail_multiplier=multiplier, rate_convention=convention)
+    show = base.basket.assign(scenario="Hypothèse centrale" if not is_extended else f"Queue {multiplier:g} ×")
+    if stress:
+        try:
+            shocked = credit_stress(snapshot, cal.discount, mode=mode, basket=list(cal.curves),
+                                     method="constrained" if cal.repricing["fit"].eq("constrained").any() else "strict",
+                                     spread_bump_bps=25.)
+            stressed = credit_coupon(shocked.curves, discount=cal.discount, tail_multiplier=multiplier,
+                                     rate_convention=convention)
+            show = pd.concat([show, stressed.basket.assign(scenario="Stress +25 pb")], ignore_index=True)
+        except ValueError as exc:
+            st.warning(f"Le choc de spread ne peut pas être recalibré · {exc}")
+    metrics = st.columns(3)
+    metrics[0].metric("Condition satisfaite au 14e semestre", f"{base.basket['credit_condition_probability'].iloc[-1]:.2%}")
+    metrics[1].metric("Premier défaut à 7 ans", f"{base.basket['first_default_pd'].iloc[-1]:.2%}")
+    metrics[2].metric("Coupon espéré au 14e semestre", f"{base.basket['expected_credit_only_coupon'].iloc[-1]:.2f}")
+    drawing = px.line(show, x="time_years", y="credit_condition_probability", color="scenario",
+                      markers=True, color_discrete_sequence=COLORS)
+    chart(drawing, "Échéance en années", "Probabilité de respecter la condition crédit", f"{key}_chart", percent=True)
+    columns = {"semester": "Semestre", "time_years": "Échéance (années)", "scenario": "Hypothèse",
+               "credit_condition_probability": "Survie du panier", "first_default_pd": "PD de premier défaut",
+               "expected_credit_only_coupon": "Coupon espéré / 100", "extrapolated": "Extrapolation"}
+    table = show[list(columns)].rename(columns=columns)
+    format_table(table, f"{key}_table", ("Survie du panier", "PD de premier défaut"))
+    left, right = st.columns(2)
+    left.download_button("Télécharger les 14 échéances", show.to_csv(index=False), "coupon_credit.csv", "text/csv",
+                         key=f"{key}_download")
+    names = snapshot.drop_duplicates("entity_id").set_index("entity_id")["bank_name"]
+    detailed = base.banks.assign(bank_name=base.banks["entity_id"].map(names))
+    right.download_button("Télécharger les PD individuelles", detailed.to_csv(index=False),
+                          "coupon_banques.csv", "text/csv", key=f"{key}_download_banks")
+    with st.expander("Survie et PD par banque"):
+        format_table(detailed[["bank_name", "time_years", "risk_neutral_survival", "risk_neutral_pd",
+                               "conditional_pd_given_alive_semester", "extrapolated"]], f"{key}_banks",
+                     ("risk_neutral_survival", "risk_neutral_pd", "conditional_pd_given_alive_semester"))
 
 
 
@@ -569,14 +685,16 @@ def main() -> None:
         st.warning("Le risque du panier à l’horizon affiché utilise une extrapolation plate sur certaines courbes.")
     fit_type = "exact" if cal.repricing["fit"].eq("exact").all() else "contraint, résidus à examiner"
     st.caption(f"Ajustement numérique · {fit_type} | Validation du livrable · démonstration synthétique")
-    tab_cds, tab_basket, tab_risk = st.tabs(
-        ["Calibration CDS", "Premier défaut & corrélation", "Risque, stress & backtest"])
+    tab_cds, tab_basket, tab_risk, tab_coupon = st.tabs(
+        ["Calibration CDS", "Premier défaut & corrélation", "Risque, stress & backtest", "Condition de crédit du coupon"])
     with tab_cds:
         calibration_view(cal, horizon)
     with tab_basket:
         basket_view(cal, horizon)
     with tab_risk:
         risk_view(cal, snapshot, q, discounts, mode, basket, method, extrapolate, horizon)
+    with tab_coupon:
+        coupon_view(cal, snapshot, mode, "regular_coupon")
 
 
 def export_figures(folder: Path = BASE / "outputs") -> None:

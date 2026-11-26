@@ -1,0 +1,86 @@
+[
+  {
+    "source": "tw",
+    "date": "2026-11-18",
+    "http_status": 200,
+    "sha256": "0a3d4e9cc33452cc9cd5b43d0baf5d5d17eb3c5be6d044e26a72cdeda0ac085e",
+    "url": "https://reports.tradeweb.com/DownloadSbSef.adl?file=/TWSBSEF-CDS-Report_2026-11-18.xml"
+  },
+  {
+    "source": "sec",
+    "date": "2026-11-18",
+    "http_status": 200,
+    "sha256": "bebea74692d330c1fad90d823a1e73a8bd667f5df5de5427001a7cd2041fd547",
+    "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/sec/SEC_CUMULATIVE_CREDITS_2026_11_18.zip"
+  },
+  {
+    "source": "tw",
+    "date": "2026-11-19",
+    "http_status": 200,
+    "sha256": "eee699461a5ce762b5bae7b43d59d647c937106ea5290311675cdeb0e7069f19",
+    "url": "https://reports.tradeweb.com/DownloadSbSef.adl?file=/TWSBSEF-CDS-Report_2026-11-19.xml"
+  },
+  {
+    "source": "sec",
+    "date": "2026-11-19",
+    "http_status": 200,
+    "sha256": "19f7f15617465bd4aea2ec0ecfe28e8e8641cd70ca11700c21f9d89f3300d2b4",
+    "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/sec/SEC_CUMULATIVE_CREDITS_2026_11_19.zip"
+  },
+  {
+    "source": "tw",
+    "date": "2026-11-20",
+    "http_status": 200,
+    "sha256": "fce19b1b86144ccaf818659c2f0566cedeb7b741a893c5757bd4809c8215968c",
+    "url": "https://reports.tradeweb.com/DownloadSbSef.adl?file=/TWSBSEF-CDS-Report_2026-11-20.xml"
+  },
+  {
+    "source": "sec",
+    "date": "2026-11-20",
+    "http_status": 200,
+    "sha256": "a97b7abd673e3bdc8621277c867560e5b337e3eca4a485c6b82953fb50b5fdfd",
+    "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/sec/SEC_CUMULATIVE_CREDITS_2026_11_20.zip"
+  },
+  {
+    "source": "tw",
+    "date": "2026-11-23",
+    "http_status": 200,
+    "sha256": "5a592151dfed9a3e6f9eaa146545f5d0340e4abdddf5977a7109fe806561921e",
+    "url": "https://reports.tradeweb.com/DownloadSbSef.adl?file=/TWSBSEF-CDS-Report_2026-11-23.xml"
+  },
+  {
+    "source": "sec",
+    "date": "2026-11-23",
+    "http_status": 200,
+    "sha256": "277ce3eaad11a1e3f906eb20f9829489130cbcc36ff1c8f71f06085f8f8d631f",
+    "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/sec/SEC_CUMULATIVE_CREDITS_2026_11_23.zip"
+  },
+  {
+    "source": "tw",
+    "date": "2026-11-24",
+    "http_status": 200,
+    "sha256": "4790eae7d330769e8a6a7899b9ffbbf1cda0e34055695151f57a50adcecb5e36",
+    "url": "https://reports.tradeweb.com/DownloadSbSef.adl?file=/TWSBSEF-CDS-Report_2026-11-24.xml"
+  },
+  {
+    "source": "sec",
+    "date": "2026-11-24",
+    "http_status": 200,
+    "sha256": "f3a148d663bf8897e93e903e06705ce0257450056ddefa5305a6438afe5d44ae",
+    "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/sec/SEC_CUMULATIVE_CREDITS_2026_11_24.zip"
+  },
+  {
+    "source": "tw",
+    "date": "2026-11-25",
+    "http_status": 200,
+    "sha256": "c72440124e67bf6a5ffcc94521af76f465a4b3408f228a107c3766d260241b5e",
+    "url": "https://reports.tradeweb.com/DownloadSbSef.adl?file=/TWSBSEF-CDS-Report_2026-11-25.xml"
+  },
+  {
+    "source": "sec",
+    "date": "2026-11-25",
+    "http_status": 200,
+    "sha256": "4af9a167c08e6d47d94814c252065c56055fcc8407ab1ae4380acb59cf2ac8a1",
+    "url": "https://pddata.dtcc.com/ppd/api/report/cumulative/sec/SEC_CUMULATIVE_CREDITS_2026_11_25.zip"
+  }
+]

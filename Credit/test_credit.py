@@ -407,9 +407,9 @@ def test_streamlit_demo_paths(monkeypatch):
     ap = st_testing.AppTest.from_file(str(Path(__file__).with_name("app.py")), default_timeout=60).run()
     assert not ap.exception
     assert not ap.error
-    assert len(ap.tabs) == 3
+    assert len(ap.tabs) == 4
     assert any("synthétiques" in element.value for element in ap.warning)
-    assert len(ap.get("plotly_chart")) == 8
+    assert len(ap.get("plotly_chart")) == 9
     model_input = next(m for m in ap.multiselect if m.label == "Modèles stochastiques à comparer")
     model_input.select("cirpp").run()
     assert not ap.exception
@@ -785,7 +785,7 @@ def test_transaction_study_recovers_public_bnp_and_independent_subordinated_bask
     assert all(len(key) == 19 for key in credits["dtcc_dissemination_id"])
 
 
-def test_public_streamlit_has_three_tabs_and_genuine_transaction_display():
+def test_public_streamlit_has_four_tabs_and_genuine_transaction_display():
     from streamlit.testing.v1 import AppTest
     from credit_engine import BASE
 
@@ -794,11 +794,12 @@ def test_public_streamlit_has_three_tabs_and_genuine_transaction_display():
     app.run()
     assert not app.exception
     assert [item.label for item in app.tabs] == ["Calibration CDS", "Premier défaut & corrélation",
-                                               "Risque, stress & backtest"]
+                                               "Risque, stress & backtest", "Condition de crédit du coupon"]
     assert any("Spreads de clôture Tradeweb" in item.value for item in app.info)
     assert any("Collecte" in item.value for item in app.caption)
     assert any("Repricing des spreads traités" in item.value for item in app.subheader)
     assert any("OPTION B" in item.value for item in app.warning)
+    assert any("Condition satisfaite au 14e semestre" == item.label for item in app.metric)
     assert any("SCENARIO" in item.value for item in app.warning)
 
 
@@ -1095,3 +1096,67 @@ def test_pricing_integration_document_runs_against_external_curve(monkeypatch):
         "collective_status": "PENDING EXTERNAL TEAMS"})
 
 
+
+def test_systemic_snapshot_and_independent_premium_legs():
+    from credit_engine import independent_cds_repricing, systemic_snapshot
+
+    quotes, discount, registry = systemic_snapshot()
+    assert quotes.valuation_date.nunique() == quotes.seniority.nunique() == 1
+    assert sorted(quotes.spread_bps) == [51.85, 54.60, 63.75]
+    assert set(quotes.entity_id) == set(registry.loc[registry.decision.eq("selected"), "upi"])
+    assert pd.to_datetime(registry.loc[registry.decision.eq("selected"), "known_from"]).le(
+        discount.valuation_date).all()
+    cal = calibrate_credit(quotes, discount)
+    rows = independent_cds_repricing(cal)
+    assert rows.within_tolerance.all()
+    assert (rows.accrued_on_default_annuity > 0).all()
+    np.testing.assert_allclose(rows.protection_leg_pv, rows.premium_leg_pv_at_input_spread, atol=2e-8)
+    assert not rows.upfront_signed_verified.any()
+
+
+def test_coupon_strict_default_boundary_and_semiannual_amount():
+    from credit_engine import coupon_survival_masks, credit_coupon, extend_credit_curves
+
+    curves = {"a": HazardCurve([0., 3.], [.015]), "b": HazardCurve([0., 7.], [.025])}
+    with pytest.raises(ValueError, match="explicit terminal hazard"):
+        credit_coupon(curves)
+    annual = credit_coupon(curves, tail_multiplier=1.)
+    per_period = credit_coupon(curves, tail_multiplier=1., rate_convention="per_semester")
+    np.testing.assert_allclose(annual.basket.independent_survival, np.exp(-.04*COUPON_TIMES))
+    np.testing.assert_allclose(annual.basket.expected_credit_only_coupon, 3.5*np.exp(-.04*COUPON_TIMES))
+    np.testing.assert_allclose(per_period.basket.expected_credit_only_coupon,
+                               2*annual.basket.expected_credit_only_coupon)
+    assert annual.basket.extrapolated.tolist() == [False]*6 + [True]*8
+    np.testing.assert_allclose(annual.banks.query("entity_id == 'a'").conditional_pd_given_alive_semester,
+                               -np.expm1(-.015*.5))
+    low = credit_coupon(curves, tail_multiplier=.5).basket
+    high = credit_coupon(curves, tail_multiplier=1.5).basket
+    assert low.first_default_pd.iloc[-1] < annual.basket.first_default_pd.iloc[-1] < high.first_default_pd.iloc[-1]
+    projected = extend_credit_curves(curves, 7., tail_multiplier=1.)
+    simulation = simulate_credit(projected, np.r_[0., COUPON_TIMES], 3, seed=433)
+    simulation = replace(simulation, default_times=np.array([[.5, np.inf], [.51, 5.],
+                                                              [np.inf, np.inf]]))
+    individual, basket = coupon_survival_masks(simulation)
+    assert individual.shape == (3, 2, 14) and basket.shape == (3, 14)
+    assert not basket[0].any()
+    assert basket[1, 0] and not basket[1, 1:].any()
+    assert basket[2].all()
+    conditional = credit_coupon(curves, tail_multiplier=1., scenarios=simulation).basket
+    np.testing.assert_allclose(conditional.credit_condition_probability, np.r_[2/3, np.repeat(1/3, 13)])
+
+
+def test_pricing_intensity_paths_match_integrated_survival():
+    from credit_engine import credit_path_intensities, extend_credit_curves
+
+    curves = extend_credit_curves({"bank": HazardCurve([0., 2., 3.], [.013, .018])}, 7.,
+                                  tail_multiplier=1.5)
+    grid = np.r_[0., COUPON_TIMES]
+    model = fit_stochastic(curves, grid, "lognormal", FactorParams(), n_calibration=512, seed=12)
+    z = scenario_normals(grid, 500, 15)
+    paths = simulate_credit(curves, grid, 500, credit_innovations=z, model=model, seed=27)
+    intensity, integrated = credit_path_intensities(curves, paths)
+    assert intensity.shape == (500, 1, 14) and integrated.shape == (500, 1, 15)
+    assert np.isfinite(intensity).all() and np.all(intensity >= 0)
+    np.testing.assert_allclose(np.diff(integrated, axis=2), intensity*np.diff(grid))
+    np.testing.assert_allclose(np.exp(-integrated).mean(axis=0), paths.conditional_mean_survival,
+                               atol=1e-13, rtol=0)
