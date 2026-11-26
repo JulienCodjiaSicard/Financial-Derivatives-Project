@@ -13,29 +13,29 @@
     "a_confirmer": "fixing BCE ou plus haut intrajournalier (question au prof)"
   },
   "courbes": {
-    "commentaire": "Courbes du sous-groupe taux : copie à l'identique de ses sorties (output/curve_eur.csv, curve_usd.csv, discount_coupon_dates.csv, hw_params.json) dans data/groupe_taux/, pour que le dossier Change fonctionne seul. Si le sous-groupe taux relance curves.py, recopier ces fichiers (voir README). Pas d'accès aux courbes OIS dans le groupe : EUR = swaps Euribor 6M en courbe unique, USD = par yields Treasury (proxy SOFR).",
+    "commentaire": "Courbes OIS du sous-groupe taux (version finale) : copie à l'identique de ses sorties (output/curve_eur.csv, curve_usd.csv, discount_coupon_dates.csv, hw_params.json, diffusion/coupons_20261113.csv) dans data/groupe_taux/, pour que le dossier Change fonctionne seul. Colonne P_lisse = P_estr / P_sofr de leur dossier diffusion/, celle que leur README demande d'utiliser pour rester cohérent avec le moteur Monte Carlo. Si le sous-groupe taux relance curves.py, recopier ces fichiers (voir README).",
     "EUR": {
-      "indice": "Euribor 6M (swaps, courbe unique) - sous-groupe taux",
+      "indice": "€STR (OIS) - sous-groupe taux",
       "type_taux": "df",
       "base_calcul": "ACT/365F",
       "fichier": "data/groupe_taux/curve_eur.csv",
       "colonne_temps": "t",
-      "colonne_df": "P_loglin",
-      "convention": "Facteurs d'actualisation P(0,t) bootstrappés par le sous-groupe taux (code/curves.py, Curve.P_at : log-linéaire en ln P), grille mensuelle 0 à 10 ans ; t en années.",
+      "colonne_df": "P_lisse",
+      "convention": "Facteurs d'actualisation P(0,t) €STR du sous-groupe taux (code/curves.py), version lisse (P = exp(−∫f), forwards instantanés lissés), grille mensuelle 0 à 10 ans ; t en années.",
       "date": "2026-11-13",
-      "source": "Sous-groupe taux, output/curve_eur.csv, copie dans data/groupe_taux/ (swaps EUR Euribor 6M 1Y-10Y du 13/11/2026)",
+      "source": "Sous-groupe taux, output/curve_eur.csv, copie dans data/groupe_taux/ (OIS €STR 1Y-30Y CheckMySwap/DTCC, fixing BCE €STR, point 6M synthétique, du 13/11/2026)",
       "hypothese": false
     },
     "USD": {
-      "indice": "Treasury par yields (proxy SOFR) - sous-groupe taux",
+      "indice": "SOFR (OIS) - sous-groupe taux",
       "type_taux": "df",
       "base_calcul": "ACT/365F",
       "fichier": "data/groupe_taux/curve_usd.csv",
       "colonne_temps": "t",
-      "colonne_df": "P_loglin",
-      "convention": "Facteurs d'actualisation P(0,t) bootstrappés par le sous-groupe taux sur les par yields Treasury (coupon semestriel), grille mensuelle 0 à 10 ans ; t en années.",
+      "colonne_df": "P_lisse",
+      "convention": "Facteurs d'actualisation P(0,t) SOFR du sous-groupe taux (code/curves.py), version lisse, grille mensuelle 0 à 10 ans ; t en années.",
       "date": "2026-11-13",
-      "source": "Sous-groupe taux, output/curve_usd.csv, copie dans data/groupe_taux/ (Daily Treasury Par Yield Curve du 13/11/2026)",
+      "source": "Sous-groupe taux, output/curve_usd.csv, copie dans data/groupe_taux/ (OIS SOFR Eris 1W-50Y et fixing NY Fed, du 13/11/2026)",
       "hypothese": false
     }
   },

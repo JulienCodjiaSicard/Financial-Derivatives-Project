@@ -1,8 +1,8 @@
-"""Intégration avec le sous-groupe taux : valorisation au 13/11/2026 sur ses courbes.
+"""Intégration avec le sous-groupe taux : valorisation au 13/11/2026 sur ses courbes OIS.
 
-Les facteurs d'actualisation EUR (swaps Euribor 6M) et USD (par yields Treasury) sont lus
-dans data/groupe_taux/, copie à l'identique des sorties du sous-groupe taux (output/) pour que
-le dossier Change fonctionne seul.
+Les facteurs d'actualisation EUR (€STR) et USD (SOFR), version lisse (colonne P_lisse, celle que
+le sous-groupe taux recommande pour le Monte Carlo), sont lus dans data/groupe_taux/, copie à
+l'identique de ses sorties pour que le dossier Change fonctionne seul.
 """
 
 from __future__ import annotations
@@ -31,8 +31,17 @@ RACINE = Path(__file__).resolve().parent.parent
 CONFIG = RACINE / "config" / "valo_2026-11-13.json"
 SORTIES_TAUX = RACINE / "data" / "groupe_taux"
 # Dossier d'origine du sous-groupe taux, s'il est présent à côté de Change/ (facultatif).
-DOSSIER_TAUX = RACINE.parent / "Taux EUR courbe de taux  calibration de Hull-White sur les swaptions" / "output"
-FICHIERS_TAUX = ("curve_eur.csv", "curve_usd.csv", "discount_coupon_dates.csv", "hw_params.json")
+DOSSIER_TAUX = RACINE.parent / "Taux EUR courbe de taux calibration de Hull-White sur les swaptions"
+# Copie locale -> fichier d'origine dans le dossier du sous-groupe taux
+FICHIERS_TAUX = {
+    "curve_eur.csv": "output/curve_eur.csv",
+    "curve_usd.csv": "output/curve_usd.csv",
+    "discount_coupon_dates.csv": "output/discount_coupon_dates.csv",
+    "hw_params.json": "output/hw_params.json",
+    "coupons_20261113.csv": "output/diffusion/coupons_20261113.csv",
+    "ester_7y.csv": "data/ester_7y.csv",
+    "EURAB6E2Y.csv": "data/EURAB6E2Y.csv",
+}
 
 
 @pytest.fixture(scope="module")
@@ -55,9 +64,11 @@ def bruts():
     return lire_json(CONFIG), lire_json(RACINE / "data" / "marche_2026-11-13.json")
 
 
-def facteurs_groupe_taux() -> list[tuple[float, float, float]]:
-    with (SORTIES_TAUX / "discount_coupon_dates.csv").open(encoding="utf-8-sig", newline="") as f:
-        return [(float(r["t"]), float(r["P_eur"]), float(r["P_usd"])) for r in csv.DictReader(f)]
+def facteurs_groupe_taux(colonnes: tuple[str, str] = ("P_estr", "P_sofr"),
+                         fichier: str = "coupons_20261113.csv") -> list[tuple[float, float, float]]:
+    """(t, P_EUR, P_USD) aux dates t = 0,5 ... 7 du sous-groupe taux (par défaut : courbes lisses)."""
+    with (SORTIES_TAUX / fichier).open(encoding="utf-8-sig", newline="") as f:
+        return [(float(r["t"]), float(r[colonnes[0]]), float(r[colonnes[1]])) for r in csv.DictReader(f)]
 
 
 # --- Copie locale des sorties du sous-groupe taux ------------------------------------------
@@ -70,9 +81,11 @@ def test_copie_locale_complete():
 @pytest.mark.skipif(not DOSSIER_TAUX.exists(), reason="dossier du sous-groupe taux absent : Change/ fonctionne seul")
 @pytest.mark.parametrize("nom", FICHIERS_TAUX)
 def test_copie_locale_a_jour(nom):
-    """Si le sous-groupe taux a relancé curves.py, recopier ses sorties dans data/groupe_taux/."""
-    assert (SORTIES_TAUX / nom).read_bytes() == (DOSSIER_TAUX / nom).read_bytes(), (
-        f"data/groupe_taux/{nom} diffère de la sortie du sous-groupe taux : la recopier puis relancer run_all.py"
+    """Si le sous-groupe taux a relancé ses scripts, recopier ses fichiers dans data/groupe_taux/."""
+    origine = DOSSIER_TAUX / FICHIERS_TAUX[nom]
+    assert (SORTIES_TAUX / nom).read_bytes() == origine.read_bytes(), (
+        f"data/groupe_taux/{nom} diffère de {FICHIERS_TAUX[nom]} du sous-groupe taux : "
+        "la recopier puis relancer run_all.py"
     )
 
 
@@ -110,18 +123,28 @@ def test_coupons_aux_dates_du_sous_groupe_taux(contexte):
 
 
 def test_df_identiques_a_ceux_du_sous_groupe_taux(courbes):
+    """Courbes lisses €STR / SOFR (P_estr, P_sofr de leur dossier diffusion/, 10 chiffres significatifs)."""
     for t, p_eur, p_usd in facteurs_groupe_taux():
-        assert courbes.eur.df(t) == pytest.approx(p_eur, abs=1e-14)
-        assert courbes.usd.df(t) == pytest.approx(p_usd, abs=1e-14)
+        assert courbes.eur.df(t) == pytest.approx(p_eur, abs=1e-9)
+        assert courbes.usd.df(t) == pytest.approx(p_usd, abs=1e-9)
+
+
+def test_ecart_courbe_lisse_et_bootstrap_log_lineaire(courbes):
+    """Leur README : écart max aux dates de coupon entre colonnes lisses et _loglin (EUR 3,7e-4, USD 1,1e-4)."""
+    loglin = facteurs_groupe_taux(("P_eur_estr", "P_usd_sofr"), "discount_coupon_dates.csv")
+    assert max(abs(courbes.eur.df(t) - p) for t, p, _ in loglin) == pytest.approx(3.7e-4, abs=1e-5)
+    assert max(abs(courbes.usd.df(t) - p) for t, _, p in loglin) == pytest.approx(1.1e-4, abs=1e-5)
 
 
 def test_forward_par_parite_des_taux(courbes):
     for t, p_eur, p_usd in facteurs_groupe_taux():
-        assert courbes.forward(t) == pytest.approx(1.1052 * p_eur / p_usd, rel=1e-12)
+        assert courbes.forward(t) == pytest.approx(1.1052 * p_eur / p_usd, rel=1e-8)  # fichier à 10 chiffres
     assert courbes.forward(7.0) > courbes.forward(1.0) > courbes.spot  # r_USD > r_EUR
 
 
 def test_courbes_marquees_comme_venant_du_sous_groupe_taux(contexte):
+    assert contexte.marche.courbe_eur.indice.startswith("€STR (OIS)")
+    assert contexte.marche.courbe_usd.indice.startswith("SOFR (OIS)")
     for c in (contexte.marche.courbe_eur, contexte.marche.courbe_usd):
         assert c.type_taux == "df" and not c.hypothese
         assert c.fichier is not None and c.fichier.parent.resolve() == SORTIES_TAUX.resolve()

@@ -7,7 +7,8 @@ Carlo et l'analyse historique de la barrière, puis écrit A_LIRE.md.
 
 Fichiers écrits dans resultats_fx/ : coupons_fx.csv, coupons_fx_probabilites.svg,
 sensibilites_fx.csv, export_mc.json, historique_barriere_fx.csv / .svg,
-vol_historique_vs_implicite_fx.csv, A_LIRE.md.
+vol_historique_vs_implicite_fx.csv, correlation_taux_change.csv (si la config a une section
+correlation_taux_change), A_LIRE.md.
 
 Exécution : python scripts/run_all.py [chemin_config]
 """
@@ -29,6 +30,8 @@ from fx.config import (  # noqa: E402
     echeancier_coupons,
     lire_fixings_bce,
 )
+from fx.correlation import calculer_correlations  # noqa: E402
+from fx.correlation import ecrire_csv as ecrire_csv_correlation  # noqa: E402
 from fx.courbes import construire_courbes  # noqa: E402
 from fx.digitales import ecrire_csv, tracer_probabilites, valoriser_coupons  # noqa: E402
 from fx.sensibilites import NOMS as NOMS_SENSIBILITES  # noqa: E402
@@ -135,9 +138,21 @@ def main(argv: list[str]) -> int:
                   f"({scenarios_bf[bf] - float(sens.base.sum()):+,.0f})")
     print(f"Écrit : {sortie / 'sensibilites_fx.csv'}")
 
-    # Étape 7 : vol effective et export vers le moteur Monte Carlo commun.
+    # Étape 7 : corrélation taux/change, vol effective et export vers le moteur Monte Carlo commun.
+    historique_long = lire_historique_sdmx(config.chemin_historique)
+    correlation = None
+    if config.correlation is not None:
+        correlation = calculer_correlations(config.correlation, historique_long, config.date_valorisation)
+        ecrire_csv_correlation(correlation, sortie / "correlation_taux_change.csv")
+        print("\nCorrélation ρ = corr(Δ taux EUR, Δ ln X), X = EUR pour 1 USD :")
+        print(f"{'série':<14} {'fenêtre':>7} {'pas':>4} {'n':>5} {'ρ':>7} {'IC 95 %':>17}")
+        for e in correlation.estimations:
+            print(f"{e.serie:<14} {e.fenetre_annees:>5} a {e.pas_jours:>3}j {e.nb_variations:>5} {e.rho:7.3f} "
+                  f"[{e.ic95_bas:6.3f} ; {e.ic95_haut:6.3f}]" + ("  <- retenue" if e is correlation.retenue else ""))
+        for f in correlation.fenetres_non_couvertes:
+            print(f"  non couverte : {f}")
     vols_eff, avert_eff = vols_effectives(resultats, courbes, k)
-    export = construire_export(config, contexte.marche, courbes, contexte.barriere, vols_eff, avert_eff)
+    export = construire_export(config, contexte.marche, courbes, contexte.barriere, vols_eff, avert_eff, correlation)
     ecrire_export(export, sortie / "export_mc.json")
     print("\nLivré au moteur MC : barrière effective K_eff (à vol ATM, redonne P smile) ; σ_eff pour information seulement")
     print(f"{'n°':>3} {'T':>7} {'σ ATM':>7} {'P smile':>8} {'K_eff':>8} {'σ_eff (info)':>13}")
@@ -149,7 +164,6 @@ def main(argv: list[str]) -> int:
     print(f"Écrit : {sortie / 'export_mc.json'}")
 
     # Étape 8 : analyse historique de la barrière (fixings BCE jusqu'à la date de valorisation).
-    historique_long = lire_historique_sdmx(config.chemin_historique)
     analyse = analyser(
         historique_long, config.date_valorisation, courbes.spot, k, resultats,
         config.sous_periode_annees, config.vol_realisee_jours, config.jours_ouvres_par_an,
@@ -180,6 +194,7 @@ def main(argv: list[str]) -> int:
         contexte=contexte, courbes=courbes, surface=surface, resultats=resultats, sensibilites=sens,
         scenarios_bf=scenarios_bf, vols_effectives=vols_eff, avertissements_vol_eff=avert_eff,
         analyse=analyse, date_generation=date.today(), dates_fixing_egal_spot_vols=egal_spot_vols,
+        correlation=correlation,
     ))
     (sortie / "A_LIRE.md").write_text(texte, encoding="utf-8")
     print(f"\nÉcrit : {sortie / 'A_LIRE.md'}")

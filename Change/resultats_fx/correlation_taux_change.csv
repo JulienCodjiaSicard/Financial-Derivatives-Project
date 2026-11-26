@@ -1,0 +1,7 @@
+﻿serie;libelle;fenetre_annees;pas_jours;debut;fin;nb_variations;rho_dr_dlnX;ic95_bas;ic95_haut;part_variations_taux_nulles;retenue
+swap_eur_2y;Swap EUR 2 ans contre Euribor 6M (clôture Investing.com, données du sous-groupe taux);1;1;2025-11-13;2026-11-13;255;0.3165;0.2015;0.4229;0.027;oui
+swap_eur_2y;Swap EUR 2 ans contre Euribor 6M (clôture Investing.com, données du sous-groupe taux);1;5;2025-11-13;2026-11-13;51;0.1144;-0.1665;0.3780;0.000;
+estr;€STR (fixing BCE);1;1;2025-11-13;2026-11-12;254;0.0008;-0.1223;0.1239;0.299;
+estr;€STR (fixing BCE);1;5;2025-11-13;2026-11-06;50;0.2531;-0.0271;0.4965;0.140;
+estr;€STR (fixing BCE);2;1;2024-11-13;2026-11-12;509;0.0059;-0.0811;0.0927;0.253;
+estr;€STR (fixing BCE);2;5;2024-11-13;2026-11-06;101;0.1573;-0.0394;0.3422;0.129;

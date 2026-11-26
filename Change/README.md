@@ -8,10 +8,18 @@ Les résultats et leur lecture sont dans [`resultats_fx/A_LIRE.md`](resultats_fx
 
 La valorisation par défaut (`config/valo_2026-11-13.json`) utilise **les courbes du sous-groupe taux**, à **sa date de valorisation, le 13/11/2026** :
 
-- EUR : swaps Euribor 6M en courbe unique ; USD : par yields Treasury, utilisés comme proxy du SOFR (le groupe n'a pas accès aux courbes OIS) ;
-- les facteurs d'actualisation sont lus dans `data/groupe_taux/curve_eur.csv` et `curve_usd.csv` (colonne `P_loglin`) : **copie à l'identique** des sorties du sous-groupe taux (`output/` de leur dossier, avec `discount_coupon_dates.csv` et `hw_params.json`). On retrouve exactement leurs `P_eur` et `P_usd` de `discount_coupon_dates.csv` (test `tests/test_groupe_taux.py`) ;
-- le dossier `Change/` fonctionne donc **seul**, sans le dossier du sous-groupe taux à côté ;
-- si le sous-groupe taux relance `code/curves.py`, recopier ses quatre fichiers de `output/` (`curve_eur.csv`, `curve_usd.csv`, `discount_coupon_dates.csv`, `hw_params.json`) dans `data/groupe_taux/`, puis relancer `python scripts/run_all.py` et `python -m pytest`. Quand leur dossier est présent à côté de `Change/`, un test signale toute copie périmée.
+- EUR : courbe **€STR (OIS)** ; USD : courbe **SOFR (OIS)**, comme le demande le sujet (version finale du sous-groupe taux) ;
+- les facteurs d'actualisation sont lus dans `data/groupe_taux/curve_eur.csv` et `curve_usd.csv`, colonne `P_lisse` : la courbe lisse que leur README demande d'utiliser pour rester cohérent avec le moteur Monte Carlo (identique à `P_estr` / `P_sofr` de leur dossier `output/diffusion/`). On retrouve leurs P(0,t) aux dates 0,5 à 7 ans (test `tests/test_groupe_taux.py`) ;
+- `data/groupe_taux/` est une **copie à l'identique** de sept fichiers du sous-groupe taux, pour que `Change/` fonctionne **seul**, sans leur dossier à côté :
+
+| Copie dans `data/groupe_taux/` | Fichier d'origine (dossier du sous-groupe taux) | Utilisation |
+|---|---|---|
+| `curve_eur.csv`, `curve_usd.csv` | `output/` | Courbes €STR et SOFR |
+| `discount_coupon_dates.csv`, `coupons_20261113.csv` | `output/`, `output/diffusion/` | Contrôle des facteurs d'actualisation (tests) |
+| `hw_params.json` | `output/` | Contrôle de la date de valorisation (tests) |
+| `ester_7y.csv`, `EURAB6E2Y.csv` | `data/` | Historiques €STR et swap EUR 2 ans, pour la corrélation taux/change ρ |
+
+Si le sous-groupe taux relance ses scripts, recopier ces fichiers, puis relancer `python scripts/run_all.py` et `python -m pytest`. Quand leur dossier est présent à côté de `Change/`, un test signale toute copie périmée.
 
 La config du 06/11/2026 (`config/valo_2026-11-06.json`, courbes €STR / SOFR relevées sur BlueGamma) est gardée pour comparaison : `python scripts/run_all.py config/valo_2026-11-06.json` (attention, ce script réécrit `resultats_fx/`).
 
@@ -35,11 +43,11 @@ Sous macOS ou Linux, remplacer la deuxième ligne par `source .venv/bin/activate
 |---|---|
 | `config/valo_2026-11-13.json` | Config par défaut : tous les paramètres (date de valorisation, fenêtre de la barrière, coupon, conventions, méthode de smile, tailles des chocs, hypothèses) |
 | `config/valo_2026-11-06.json` | Ancienne config (courbes €STR / SOFR au 06/11/2026), gardée pour comparaison |
-| `data/` | Fixings BCE (fenêtre de la barrière jusqu'au 06/11 ou au 13/11, et historique depuis 1999), courbes €STR et SOFR du 06/11, fichiers de marché (spot, courbes, vols) |
+| `data/` | Fixings BCE (fenêtre de la barrière jusqu'au 06/11 ou au 13/11, et historique depuis 1999), fichiers de marché (spot, courbes, vols), courbes €STR et SOFR BlueGamma du 06/11 (comparaison), copie des fichiers du sous-groupe taux (`groupe_taux/`) |
 | `fx/` | Le code, un module par étape : `config`, `courbes`, `gk`, `smile`, `digitales`, `sensibilites`, `vol_effective`, `export_mc`, `historique`, `rapport` |
 | `scripts/run_all.py` | Lance toute la chaîne et écrit `resultats_fx/` |
 | `tests/` | Tests `pytest` de chaque étape |
-| `resultats_fx/` | Résultats : `A_LIRE.md`, `coupons_fx.csv`, `sensibilites_fx.csv`, `export_mc.json` (pour le moteur commun), analyse historique, graphiques |
+| `resultats_fx/` | Résultats : `A_LIRE.md`, `coupons_fx.csv`, `sensibilites_fx.csv`, `export_mc.json` (pour le moteur commun), `correlation_taux_change.csv`, analyse historique, graphiques |
 
 ## Pour le sous-groupe Monte Carlo
 
@@ -53,7 +61,8 @@ Le moteur commun n'a **aucun code à lancer chez nous** : il lit le fichier [`re
 | `fx_vol_tenors` | Les 14 dates de coupon en années (ACT/365F) |
 | `fx_atm_vols` | Vol ATM de marché à chaque date (décimal), à utiliser comme vol du change dans la simulation |
 | `fx_barrier` | **Barrière effective, une par date** : avec la vol ATM, elle redonne la probabilité calculée avec le smile. À utiliser à la place du K unique |
-| `usd_ois` | Courbe USD au format `Curve(tenors, zeros)` (taux zéro continus, années). Nom de clé gardé pour le moteur ; la courbe réelle est indiquée dans `indice_courbe_usd` (Treasury, proxy SOFR) |
+| `usd_ois` | Courbe USD SOFR (OIS) au format `Curve(tenors, zeros)` (taux zéro continus, années) ; nom dans `indice_courbe_usd` |
+| `fx_rate_corr` | **Corrélation taux/change ρ** de la décomposition de Cholesky du sujet, Z_X = ρ Z_r + √(1 − ρ²) Z′, avec X = EUR pour 1 USD (pour un moteur qui simule FX = USD pour 1 EUR, prendre −ρ). Explications dans `note_fx_rate_corr`, détail des estimations dans le bloc `correlation_taux_change` et dans `resultats_fx/correlation_taux_change.csv` |
 
 Une seule modification dans `pricer_note_ece.py` : remplacer la comparaison au K unique par
 

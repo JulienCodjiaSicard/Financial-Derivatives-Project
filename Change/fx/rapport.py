@@ -10,7 +10,8 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Mapping, Sequence
 
-from fx.config import ContexteValo, MarcheFX
+from fx.config import ContexteValo, Courbe, MarcheFX
+from fx.correlation import ResultatCorrelation
 from fx.courbes import CourbesFX
 from fx.digitales import ResultatCoupon
 from fx.historique import AnalyseHistorique
@@ -47,6 +48,7 @@ class EntreesRapport:
     date_generation: date
     # Dates (historique complet, au-delà de la valo) où le fixing BCE égale le spot de référence des vols
     dates_fixing_egal_spot_vols: tuple[date, ...] = ()
+    correlation: ResultatCorrelation | None = None
 
 
 def courbes_du_groupe_taux(marche: MarcheFX) -> bool:
@@ -54,11 +56,21 @@ def courbes_du_groupe_taux(marche: MarcheFX) -> bool:
     return all(c is not None and c.type_taux == "df" for c in (marche.courbe_eur, marche.courbe_usd))
 
 
+def nom_court(courbe: Courbe | None, defaut: str) -> str:
+    """Nom de l'indice sans la mention de provenance (« €STR (OIS) - sous-groupe taux » → « €STR (OIS) »)."""
+    return courbe.indice.split(" - ")[0] if courbe is not None else defaut
+
+
+def courbes_ois(marche: MarcheFX) -> bool:
+    """Vrai si les deux courbes sont des courbes OIS (€STR, SOFR), comme le demande le sujet."""
+    noms = (nom_court(marche.courbe_eur, ""), nom_court(marche.courbe_usd, ""))
+    return all("OIS" in n or "€STR" in n or "SOFR" in n for n in noms)
+
+
 def libelle_ecart(marche: MarcheFX) -> str:
     """Nom de l'écart de taux USD − EUR selon les courbes utilisées."""
-    if courbes_du_groupe_taux(marche):
-        return "Treasury − Euribor 6M (courbes du sous-groupe taux)"
-    return "SOFR − €STR"
+    ecart = f"{nom_court(marche.courbe_usd, 'USD')} − {nom_court(marche.courbe_eur, 'EUR')}"
+    return f"{ecart} du sous-groupe taux" if courbes_du_groupe_taux(marche) else ecart
 
 
 LIBELLES_SENSIBILITES = {
@@ -155,9 +167,10 @@ def generer_a_lire(e: EntreesRapport) -> str:
     a("")
     a("Choix de méthode :\n")
     if courbes_du_groupe_taux(marche):
-        a("- Courbes : facteurs d'actualisation du sous-groupe taux repris tels quels (EUR : swaps Euribor 6M en "
-          "courbe unique ; USD : par yields Treasury, proxy SOFR), interpolés en log-linéaire comme dans leur code : "
-          "on retrouve exactement leurs P_eur et P_usd aux dates t = 0,5 ... 7 ans. Forward F(T) = S · DF_EUR / DF_USD.")
+        a(f"- Courbes : facteurs d'actualisation du sous-groupe taux repris tels quels (EUR : "
+          f"{nom_court(marche.courbe_eur, 'EUR')} ; USD : {nom_court(marche.courbe_usd, 'USD')}), interpolés en "
+          "log-linéaire entre leurs nœuds mensuels : on retrouve exactement leurs P(0,t) aux dates t = 0,5 ... 7 ans. "
+          "Forward F(T) = S · DF_EUR / DF_USD.")
     else:
         a("- Courbes : bootstrap des swaps OIS au pair (jambe fixe annuelle ACT/360), DF interpolés en log-linéaire, "
           "taux de swap des échéances annuelles non cotées (4, 6, 8, 9 ans) interpolés linéairement.")
@@ -233,6 +246,31 @@ def generer_a_lire(e: EntreesRapport) -> str:
             a(f"- {w}")
     a("")
 
+    if e.correlation is not None:
+        co, r = e.correlation, e.correlation.retenue
+        a("### Corrélation taux/change ρ\n")
+        a(f"Livrée au moteur dans `fx_rate_corr` : **ρ = {nombre(r.rho, 2)}** (intervalle de confiance à 95 % : "
+          f"{nombre(r.ic95_bas, 2)} à {nombre(r.ic95_haut, 2)}), pour la décomposition de Cholesky du sujet "
+          "Z_X = ρ Z_r + √(1 − ρ²) Z′, avec X = EUR pour 1 USD. ρ est la corrélation entre les variations du taux EUR "
+          f"et celles de ln X, estimée sur {r.libelle.split(' (')[0]}, {r.fenetre_annees} an, variations "
+          f"{'journalières' if r.pas_jours == 1 else f'sur {r.pas_jours} jours'} ({r.nb_variations} variations, "
+          f"du {jj_mm_aaaa(r.debut)} au {jj_mm_aaaa(r.fin)}). Pour un moteur qui simule FX = USD pour 1 EUR, prendre −ρ.\n")
+        a("| Série de taux EUR | Fenêtre | Variations | n | ρ | IC 95 % | Variations du taux nulles |")
+        a("|---|---|---|---|---|---|---|")
+        for x in co.estimations:
+            ligne = (f"| {x.libelle.split(' (')[0]}{' **(retenue)**' if x is r else ''} | "
+                     f"{x.fenetre_annees} an{'s' if x.fenetre_annees > 1 else ''} | "
+                     f"{'journalières' if x.pas_jours == 1 else f'{x.pas_jours} jours'} | {x.nb_variations} | "
+                     f"{nombre(x.rho, 2)} | {nombre(x.ic95_bas, 2)} à {nombre(x.ic95_haut, 2)} | "
+                     f"{pct(x.part_variations_nulles, 0)} |")
+            a(ligne)
+        a("")
+        a(f"Choix : {co.justification}\n")
+        if co.fenetres_non_couvertes:
+            a(f"Fenêtres non couvertes par les données : {' ; '.join(co.fenetres_non_couvertes)}.\n")
+        a("ρ > 0 signifie que, sur la période, une hausse des taux EUR est allée avec une hausse du dollar contre l'euro "
+          "(X monte). Dans ce pricing, les taux sont déterministes : ρ n'agit que dans le moteur Monte Carlo.\n")
+
     an = e.analyse
     a("## Vue de l'investisseur : analyse historique\n")
     a(f"Fréquence, sur les fixings BCE du {jj_mm_aaaa(an.debut)} au {jj_mm_aaaa(an.fin)}, des hausses de l'EUR/USD "
@@ -267,6 +305,7 @@ def generer_a_lire(e: EntreesRapport) -> str:
         ("export_mc.json", "paramètres pour le moteur Monte Carlo commun (barrière effective par date, usd_ois) et test de contrôle"),
         ("historique_barriere_fx.csv / .svg", "analyse historique par horizon"),
         ("vol_historique_vs_implicite_fx.csv", "vol réalisée et vol implicite"),
+        *((("correlation_taux_change.csv", "estimations de la corrélation taux/change ρ"),) if e.correlation else ()),
         ("A_LIRE.md", "ce document"),
     ):
         a(f"- `{nom}` : {desc}.")
@@ -294,13 +333,18 @@ def generer_a_lire(e: EntreesRapport) -> str:
         "(voir scénarios), plus marqué sur le premier coupon.",
         "BF coté traité comme un smile strangle alors que le marché cote un market strangle (écart faible ici, |RR| < 1 point).",
         "Approximation Vanna-Volga de Castagna-Mercurio (SABR donne moins de 0,02 point d'écart en K).",
-        "Taux USD et EUR déterministes ; corrélation taux/change non modélisée ici (traitée, le cas échéant, par le moteur commun).",
+        ("Taux USD et EUR déterministes dans ce pricing : la corrélation taux/change ρ (estimée ci-dessus, "
+         f"{nombre(e.correlation.retenue.rho, 2)}) n'agit que dans le moteur commun. Estimation sur un an seulement ; "
+         "fixings BCE (14 h 15) et clôtures des swaps non simultanés, ce qui peut tirer l'estimation vers 0 ; "
+         "écart notable entre pas journalier et hebdomadaire, à garder en tête (sensibilité à tester dans le moteur)."
+         if e.correlation is not None else
+         "Taux USD et EUR déterministes ; corrélation taux/change non modélisée ici (traitée, le cas échéant, par le moteur commun)."),
         *((
-            "**Courbes sans OIS** (pas d'accès dans le groupe) : EUR Euribor 6M au lieu de l'€STR, USD Treasury au lieu "
-            "du SOFR. Le forward de change en dépend directement (parité des taux) ; une couverture de marché se ferait "
-            f"sur les courbes OIS. Ordre de grandeur : {nombre(sens.total('ecart_taux'))} EUR par "
+            f"**Courbes sans OIS** (EUR : {nom_court(marche.courbe_eur, 'EUR')}, USD : "
+            f"{nom_court(marche.courbe_usd, 'USD')}) : le sujet demande €STR et SOFR. Le forward de change en dépend "
+            f"directement (parité des taux). Ordre de grandeur : {nombre(sens.total('ecart_taux'))} EUR par "
             f"+{nombre(1e4 * c.ecart_taux, 0)} bp d'écart de taux USD − EUR.",
-        ) if courbes_du_groupe_taux(marche) else ()),
+        ) if not courbes_ois(marche) else ()),
         "Courbe unique par devise (pas de base cross-currency) ; swaps supposés démarrer à la date de valorisation (pas de T+2).",
         date_vols,
         "K à confirmer : fixing BCE retenu ; un plus haut intrajournalier donnerait un K plus élevé "

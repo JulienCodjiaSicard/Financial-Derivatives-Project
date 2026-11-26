@@ -16,7 +16,8 @@ from fx.rapport import nombre, pct
 RACINE = Path(__file__).resolve().parent.parent
 FICHIERS = (
     "coupons_fx.csv", "coupons_fx_probabilites.svg", "sensibilites_fx.csv", "export_mc.json",
-    "historique_barriere_fx.csv", "historique_barriere_fx.svg", "vol_historique_vs_implicite_fx.csv", "A_LIRE.md",
+    "historique_barriere_fx.csv", "historique_barriere_fx.svg", "vol_historique_vs_implicite_fx.csv",
+    "correlation_taux_change.csv", "A_LIRE.md",
 )
 
 
@@ -35,6 +36,8 @@ def sortie(tmp_path_factory):
     for cle in ("fixings_bce", "marche", "historique_bce"):
         brut["chemins"][cle] = str(RACINE / brut["chemins"][cle])
     brut["chemins"]["resultats"] = str(tmp / "resultats_fx")
+    for serie in brut.get("correlation_taux_change", {}).get("series", {}).values():
+        serie["fichier"] = str(RACINE / serie["fichier"])
     # Fichier de marché recopié avec des chemins de courbes absolus (ils sont relatifs à la racine du projet)
     marche = lire_json(Path(brut["chemins"]["marche"]))
     for dev in ("EUR", "USD"):
@@ -84,7 +87,18 @@ def test_a_lire_contenu(sortie):
         assert section in texte, section
     for mot in ("K = 1,1770", "07/05/2026", "coupon_par_periode", "bf25_manquant", "vols_au_dela_dernier_pilier",
                 "plus haut intrajournalier", "cross-currency", "corrélation taux/change", "Vanna-Volga",
-                "fixing BCE du 19/11/2026", "12 dates sur 14", "sous-groupe taux", "Courbes sans OIS", "13/11/2026"):
+                "fixing BCE du 19/11/2026", "12 dates sur 14", "sous-groupe taux", "SOFR (OIS) − €STR (OIS)", "13/11/2026",
+                "fx_rate_corr", "Corrélation taux/change ρ"):
         assert mot in texte, mot
     assert len(re.findall(r"^\| \d+ \| \d{2}/\d{2}/\d{4} \|", texte, flags=re.M)) == 14
     assert "nan" not in texte.lower().replace("nanc", "")
+
+
+def test_export_contient_la_correlation(sortie):
+    export = json.loads((sortie / "export_mc.json").read_text(encoding="utf-8"))
+    rho = export["pour_pricer_note_ece"]["fx_rate_corr"]
+    assert -1 < rho < 1
+    assert export["correlation_taux_change"]["retenue"]["rho"] == rho
+    assert "−ρ" in export["pour_pricer_note_ece"]["note_fx_rate_corr"]
+    texte = (sortie / "A_LIRE.md").read_text(encoding="utf-8")
+    assert f"ρ = {nombre(rho, 2)}" in texte

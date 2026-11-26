@@ -22,6 +22,36 @@
     "jours_ouvres_par_an": 252,
     "commentaire": "Historique BCE téléchargé le 19/11/2026 (format SDMX CSV, portail de données BCE). Seuls les fixings jusqu'à la date de valorisation sont utilisés. Fenêtres glissantes quotidiennes ; fixing de fin = dernier fixing publié à la date d'échéance ou avant."
   },
+  "correlation_taux_change": {
+    "series": {
+      "swap_eur_2y": {
+        "libelle": "Swap EUR 2 ans contre Euribor 6M (clôture Investing.com, données du sous-groupe taux)",
+        "fichier": "data/groupe_taux/EURAB6E2Y.csv",
+        "format": "investing"
+      },
+      "estr": {
+        "libelle": "€STR (fixing BCE)",
+        "fichier": "data/groupe_taux/ester_7y.csv",
+        "format": "bce_estr"
+      }
+    },
+    "fenetres_annees": [
+      1,
+      2
+    ],
+    "pas_jours": [
+      1,
+      5
+    ],
+    "retenue": {
+      "serie": "swap_eur_2y",
+      "fenetre_annees": 1,
+      "pas_jours": 1,
+      "hypothese": true,
+      "justification": "Le sujet demande ρ estimé sur l'historique journalier (1 à 2 ans). Swap EUR 2 ans retenu comme mesure des chocs du taux court Hull-White : en modèle à un facteur, tous les taux bougent avec le même Z_r. L'€STR ne bouge qu'aux décisions de la BCE (corrélation proche de 0, donnée pour comparaison). Un an : seule profondeur disponible pour le swap 2 ans."
+    },
+    "commentaire": "ρ = corr(Δ taux EUR, Δ ln X), X = 1/FX = EUR pour 1 USD (notation du sujet, section 4.3 : Z_X = ρ Z_r + √(1−ρ²) Z′). Fixings BCE (14 h 15) et clôtures des swaps ne sont pas simultanés ; le pas hebdomadaire est calculé pour contrôle. Seules les données jusqu'à la date de valorisation sont utilisées."
+  },
   "barriere": {
     "debut_observation": "2026-05-06",
     "fin_observation": "2026-11-06",
@@ -53,7 +83,7 @@
     "interpolation_courbes": {
       "facteurs_actualisation": "log_lineaire",
       "taux_swap_manquants": "lineaire",
-      "commentaire": "Courbes du sous-groupe taux lues en facteurs d'actualisation (type df) : interpolation log-linéaire entre leurs nœuds mensuels, identique à leur Curve.P_at. Leurs maturités sont des années, utilisées directement comme temps t (ACT/365F depuis le 13/11/2026 pour les dates de coupon ; écart de quelques jours au plus, effet sur les DF de l'ordre de 1e-4)."
+      "commentaire": "Courbes OIS €STR et SOFR du sous-groupe taux lues en facteurs d'actualisation (type df, colonne P_lisse) : interpolation log-linéaire entre leurs nœuds mensuels (entre deux nœuds, écart à leur courbe lisse au plus 2e-5 en ln P ; exact aux nœuds). Leurs maturités sont des années, utilisées directement comme temps t (ACT/365F depuis le 13/11/2026 pour les dates de coupon ; écart de quelques jours au plus, effet sur les DF de l'ordre de 1e-4)."
     }
   },
   "smile": {
@@ -69,7 +99,7 @@
     "bf25_pts": 0.1,
     "ecart_taux_bp": 10.0,
     "barriere_k": 0.01,
-    "commentaire": "Chocs centrés (±), résultat rapporté pour le choc +. Vols à delta constant quand le spot bouge (sticky delta). Écart de taux : choc parallèle des taux zéro USD (courbe Treasury du sous-groupe taux), courbe EUR inchangée."
+    "commentaire": "Chocs centrés (±), résultat rapporté pour le choc +. Vols à delta constant quand le spot bouge (sticky delta). Écart de taux : choc parallèle des taux zéro USD (courbe SOFR du sous-groupe taux), courbe EUR inchangée."
   },
   "hypotheses_marche": {
     "bf25_manquant": {

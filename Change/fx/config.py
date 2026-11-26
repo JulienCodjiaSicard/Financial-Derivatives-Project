@@ -146,6 +146,34 @@ class ChocsSensibilite:
 
 
 @dataclass(frozen=True)
+class SerieTaux:
+    """Série historique d'un taux EUR (en %), pour l'estimation de la corrélation taux/change."""
+
+    nom: str
+    libelle: str
+    fichier: Path
+    format: str  # "bce_estr" ou "investing"
+
+
+@dataclass(frozen=True)
+class CorrelationRetenue:
+    serie: str
+    fenetre_annees: int
+    pas_jours: int
+    justification: str
+
+
+@dataclass(frozen=True)
+class ConfigCorrelation:
+    """Section "correlation_taux_change" : séries, fenêtres (années) et pas (jours) testés, choix retenu."""
+
+    series: Mapping[str, SerieTaux]
+    fenetres_annees: tuple[int, ...]
+    pas_jours: tuple[int, ...]
+    retenue: CorrelationRetenue
+
+
+@dataclass(frozen=True)
 class ConfigValo:
     """Paramètres de valorisation : dates, chemins, termes de la note, conventions."""
 
@@ -180,6 +208,7 @@ class ConfigValo:
     jours_ouvres_par_an: int
     hypotheses_marche: HypothesesMarche
     hypotheses: tuple[Hypothese, ...]
+    correlation: ConfigCorrelation | None = None  # section facultative de la config
 
 
 @dataclass(frozen=True)
@@ -543,6 +572,44 @@ def _hypotheses_marche(brut: Any) -> HypothesesMarche:
     )
 
 
+FORMATS_SERIES_TAUX = ("bce_estr", "investing")
+
+
+def _config_correlation(d: Any, racine: Path) -> tuple[ConfigCorrelation, Hypothese]:
+    ch = "config.correlation_taux_change"
+    series_brutes = _champ(d, "series", ch)
+    if not isinstance(series_brutes, Mapping) or not series_brutes:
+        raise ErreurConfig(f"{ch}.series : objet {{nom: série}} non vide attendu")
+    series: dict[str, SerieTaux] = {}
+    for nom, sb in series_brutes.items():
+        cs = f"{ch}.series.{nom}"
+        fmt = _texte(_champ(sb, "format", cs), f"{cs}.format")
+        if fmt not in FORMATS_SERIES_TAUX:
+            raise ErreurConfig(f"{cs}.format : {fmt!r} (attendu : {', '.join(FORMATS_SERIES_TAUX)})")
+        f = Path(_texte(_champ(sb, "fichier", cs), f"{cs}.fichier"))
+        series[nom] = SerieTaux(nom=nom, libelle=_texte(_champ(sb, "libelle", cs), f"{cs}.libelle"),
+                                fichier=f if f.is_absolute() else racine / f, format=fmt)
+
+    def entiers(cle: str) -> tuple[int, ...]:
+        v = _champ(d, cle, ch)
+        if not isinstance(v, list) or not v:
+            raise ErreurConfig(f"{ch}.{cle} : liste non vide d'entiers attendue")
+        return tuple(_entier_positif(x, f"{ch}.{cle}") for x in v)
+
+    fenetres, pas = entiers("fenetres_annees"), entiers("pas_jours")
+    r = _champ(d, "retenue", ch)
+    cr = f"{ch}.retenue"
+    serie = _texte(_champ(r, "serie", cr), f"{cr}.serie")
+    if serie not in series:
+        raise ErreurConfig(f"{cr}.serie : {serie!r} absente de {ch}.series")
+    fen = _entier_positif(_champ(r, "fenetre_annees", cr), f"{cr}.fenetre_annees")
+    p = _entier_positif(_champ(r, "pas_jours", cr), f"{cr}.pas_jours")
+    if fen not in fenetres or p not in pas:
+        raise ErreurConfig(f"{cr} : fenêtre et pas retenus doivent figurer dans fenetres_annees et pas_jours")
+    h = _hypothese("correlation_taux_change", r, cr, f"{serie}, {fen} an(s), pas {p} jour(s)")
+    return ConfigCorrelation(series, fenetres, pas, CorrelationRetenue(serie, fen, p, h.justification)), h
+
+
 def config_depuis_dict(brut: Mapping[str, Any], racine: Path) -> ConfigValo:
     """Construit et valide la config à partir du JSON déjà lu (fonction pure)."""
     hypotheses: list[Hypothese] = []
@@ -632,6 +699,10 @@ def config_depuis_dict(brut: Mapping[str, Any], racine: Path) -> ConfigValo:
 
     hm = _hypotheses_marche(brut.get("hypotheses_marche", {}))
     hypotheses.extend(hm.liste)
+    correlation = None
+    if brut.get("correlation_taux_change") is not None:
+        correlation, h = _config_correlation(brut["correlation_taux_change"], racine)
+        hypotheses.append(h)
 
     return ConfigValo(
         racine=racine,
@@ -679,6 +750,7 @@ def config_depuis_dict(brut: Mapping[str, Any], racine: Path) -> ConfigValo:
         jours_ouvres_par_an=_entier_positif(_champ(hi, "jours_ouvres_par_an", ch), f"{ch}.jours_ouvres_par_an"),
         hypotheses_marche=hm,
         hypotheses=tuple(hypotheses),
+        correlation=correlation,
     )
 
 

@@ -10,6 +10,10 @@ Ce qui est livré au moteur (bloc "pour_pricer_note_ece") : la barrière effecti
   en décimal (le moteur les interpole linéairement). Les dates de coupon sont ajoutées aux
   nœuds de la courbe pour que le moteur retrouve exactement nos DF USD à ces dates.
 
+- fx_rate_corr (si la config a une section correlation_taux_change) : ρ = corr(Z_r, Z_X) du
+  sujet (section 4.3), X = EUR pour 1 USD ; Z_X = ρ Z_r + √(1 − ρ²) Z′. Détail des estimations
+  dans le bloc "correlation_taux_change".
+
 Changement à faire dans le moteur (il compare aujourd'hui à un K unique) :
     ok_fx = sim["fx"] < np.asarray(terms.fx_barrier).reshape(-1, 1)
 
@@ -18,7 +22,7 @@ N(−d1(σ)) = P_smile a deux racines et aucune n'est réaliste (17,8 % ou 0,6 %
 Elle n'est reportée, à titre d'information, que jusqu'à config.sigma_eff_max_annees.
 
 Validité : simulation lognormale de l'EUR/USD sous la mesure risque-neutre EUR, avec les
-mêmes courbes EUR et USD (celles du fichier de marché : sous-groupe taux au 13/11/2026). Le moteur simule des taux EUR stochastiques (Hull-White) : un
+mêmes courbes EUR et USD (celles du fichier de marché : OIS €STR et SOFR du sous-groupe taux au 13/11/2026). Le moteur simule des taux EUR stochastiques (Hull-White) : un
 petit écart sur les probabilités est normal, plus d'un point signalerait un problème de
 convention (bloc "controle_moteur").
 """
@@ -30,6 +34,7 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from fx.config import Barriere, ConfigValo, MarcheFX
+from fx.correlation import ResultatCorrelation
 from fx.courbes import CourbeActualisation, CourbesFX
 from fx.vol_effective import VolEffective
 
@@ -49,6 +54,7 @@ def construire_export(
     barriere: Barriere,
     vols: Sequence[VolEffective],
     avertissements: Sequence[str],
+    correlation: ResultatCorrelation | None = None,
 ) -> dict[str, Any]:
     """Dictionnaire JSON de l'export (fonction pure)."""
     t_coupons = [v.t for v in vols]
@@ -58,7 +64,7 @@ def construire_export(
          f"{hors_horizon[-1]}) : deux racines, aucune réaliste ; ne pas l'utiliser dans le moteur."]
         if hors_horizon else []
     )
-    return {
+    export: dict[str, Any] = {
         "description": (
             "Composante EUR/USD de la note ECE : paramètres pour le moteur Monte Carlo. "
             "X = USD pour 1 EUR ; coupon payé en EUR si X_T < K ; mesure risque-neutre EUR."
@@ -125,6 +131,28 @@ def construire_export(
         "hypotheses_marche_utilisees": list(marche.hypotheses_utilisees),
         "avertissements": list(marche.avertissements) + list(avertissements) + avert_sigma,
     }
+    if correlation is not None:
+        r = correlation.retenue
+        export["pour_pricer_note_ece"]["fx_rate_corr"] = r.rho
+        export["pour_pricer_note_ece"]["note_fx_rate_corr"] = (
+            "ρ = corr(Z_r, Z_X) avec X = 1/FX = EUR pour 1 USD (sujet, section 4.3) : "
+            "Z_X = ρ Z_r + √(1 − ρ²) Z′. Pour un moteur qui simule FX = USD pour 1 EUR, prendre −ρ. "
+            f"Estimé sur {r.libelle}, {r.fenetre_annees} an(s), variations sur {r.pas_jours} jour(s) "
+            f"(IC 95 % : {r.ic95_bas:.2f} à {r.ic95_haut:.2f})."
+        )
+        export["correlation_taux_change"] = {
+            "retenue": {"serie": r.serie, "fenetre_annees": r.fenetre_annees, "pas_jours": r.pas_jours,
+                        "rho": r.rho, "ic95": [r.ic95_bas, r.ic95_haut], "nb_variations": r.nb_variations,
+                        "debut": r.debut.isoformat(), "fin": r.fin.isoformat()},
+            "justification": correlation.justification,
+            "estimations": [
+                {"serie": e.serie, "libelle": e.libelle, "fenetre_annees": e.fenetre_annees, "pas_jours": e.pas_jours,
+                 "rho": e.rho, "ic95": [e.ic95_bas, e.ic95_haut], "nb_variations": e.nb_variations}
+                for e in correlation.estimations
+            ],
+            "fenetres_non_couvertes": list(correlation.fenetres_non_couvertes),
+        }
+    return export
 
 
 def ecrire_export(export: dict[str, Any], chemin: Path) -> None:
